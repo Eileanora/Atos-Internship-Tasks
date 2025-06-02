@@ -17,7 +17,7 @@ public class InputValidators : IInputValidators
     public string ValidateOperator(string op)
     {
         var msg="";
-        if ( ConstantMsgs.Operators.IndexOf(op) < 0)
+        if ( ConstantVars.Operators.IndexOf(op) < 0)
         {
             msg= ErrorMsgs.InvalidOperator;
         }

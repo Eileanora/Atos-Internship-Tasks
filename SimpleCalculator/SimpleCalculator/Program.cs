@@ -3,9 +3,8 @@ using SimpleCalculator.Classes;
 using SimpleCalculator.Constants;
 using SimpleCalculator.Interfaces;
 
-
-IInputValidators inputValidators = new InputValidators();
-ICustomMath customMath = new CustomMath();
+IValidateAll validateAll = new ValidateAll(new InputValidators());
+IOperations operations = new Operations(new CustomMath());
 
 while (true)
 {
@@ -33,7 +32,7 @@ while (true)
         
         var parts = trimmedInput.Split(" ").ToList();
         parts.Insert(0, trimmedInput);
-        var validationMsg = ValidateAll(parts);
+        var validationMsg = validateAll.RunAllValidators(parts);
         if (validationMsg != "")
         {
             Console.WriteLine(validationMsg);
@@ -45,17 +44,21 @@ while (true)
         char op = char.Parse(parts[2]);
         try
         {
-            double result = Calculate(number1, number2, op);
+            double result = operations.Calculate(number1, number2, op);
             Console.WriteLine($"Result: {result}");
             Console.WriteLine(ConstantMsgs.InputMessage);
         }
-        catch (OverflowException ex)
+        catch (OverflowException ex) // configure an ILogger to log exceptions for developer use
         {
             Console.WriteLine(ErrorMsgs.OverflowError);
         }
         catch (DivideByZeroException ex)
         {
             Console.WriteLine(ErrorMsgs.DivideZero);
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ErrorMsgs.GeneralError);
         }
     }
     
@@ -65,40 +68,3 @@ while (true)
         break;
     }
 }
-string ValidateAll(List<string> parts)
-{
-    string errorMsg = "";
-    
-    var validators = new Validator[]{
-        inputValidators.ValidateInput,
-        inputValidators.ValidateInputNumber,
-        inputValidators.ValidateOperator,
-        inputValidators.ValidateInputNumber};
-    
-    var msg = "";
-    for(var i = 0; i < validators.Length; i++){
-        msg = validators[i](parts[i]);
-        if(!string.IsNullOrEmpty(msg))
-        {
-            errorMsg = msg;
-            break;
-        }
-    }
-    return errorMsg;
-}
-
-double Calculate(double x, double y, char op)
-{
-    return op switch
-    {
-        '+' => customMath.Add(x, y),
-        '-' => customMath.Subtract(x, y),
-        '*' => customMath.Multiply(x, y),
-        '/' => customMath.Divide(x, y),
-        '%' => customMath.Modulus(x, y),
-        '^' => customMath.Power(x, y),
-        _ => throw new InvalidOperationException(ErrorMsgs.InvalidOperator)
-    };
-}
-
-delegate string Validator(string input);
