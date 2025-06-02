@@ -1,0 +1,14 @@
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\bin\Debug\net8.0\AtosTasks.exe
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\bin\Debug\net8.0\AtosTasks.deps.json
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\bin\Debug\net8.0\AtosTasks.runtimeconfig.json
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\bin\Debug\net8.0\AtosTasks.dll
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\bin\Debug\net8.0\AtosTasks.pdb
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\obj\Debug\net8.0\AtosTasks.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\obj\Debug\net8.0\AtosTasks.AssemblyInfoInputs.cache
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\obj\Debug\net8.0\AtosTasks.AssemblyInfo.cs
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\obj\Debug\net8.0\AtosTasks.csproj.CoreCompileInputs.cache
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\obj\Debug\net8.0\AtosTasks.dll
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\obj\Debug\net8.0\refint\AtosTasks.dll
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\obj\Debug\net8.0\AtosTasks.pdb
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\obj\Debug\net8.0\AtosTasks.genruntimeconfig.cache
+C:\Users\yasme\RiderProjects\AtosTasks\AtosTasks\obj\Debug\net8.0\ref\AtosTasks.dll
