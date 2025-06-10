@@ -1,4 +1,4 @@
-﻿namespace WebApi.Models;
+﻿namespace Domain.Models;
 
 public class Owner : BaseEntityPrimaryKey
 {
