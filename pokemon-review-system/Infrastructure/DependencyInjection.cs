@@ -1,8 +1,10 @@
 ﻿using Infrastructure.Data;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Service.Interfaces;
 
 namespace Infrastructure;
 
@@ -18,7 +20,10 @@ public static class DependencyInjection
             options.EnableDetailedErrors();
         });
         services.AddTransient<Seed>();
-        
+        services.AddScoped<IPokemonRepository, PokemonRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICountryRepository, CountryRepository>();
+        // services.AddScoped<>();
         return services;
     }
 }

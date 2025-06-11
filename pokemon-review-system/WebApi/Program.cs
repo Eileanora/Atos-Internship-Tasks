@@ -1,10 +1,18 @@
 using Infrastructure;
 using Infrastructure.Data;
+using Service;
+using WebApi.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.InputFormatters.Insert(0, JsonPatchInputFormatter.GetJsonPatchInputFormatter());
+});
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddServiceLayer();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // services end here
 var app = builder.Build();
@@ -29,7 +37,7 @@ void SeedData(IHost app)
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
-
+app.UseSwagger();
 app.MapControllers();
 
 
