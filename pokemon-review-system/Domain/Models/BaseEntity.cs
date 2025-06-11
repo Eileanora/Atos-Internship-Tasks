@@ -2,6 +2,6 @@
 
 public class BaseEntity
 {
-    public int CreatedDate { get; set; }
-    public int ModifiedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 }

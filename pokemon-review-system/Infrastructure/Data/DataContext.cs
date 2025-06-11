@@ -17,4 +17,5 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Category> Categories { get; set; }
     public DbSet<PokemonCategory> PokemonCategories { get; set; }
     public DbSet<Country> Countries { get; set; }
+    public DbSet<PokemonOwner> PokemonOwners { get; set; }
 }

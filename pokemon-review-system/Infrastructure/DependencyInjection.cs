@@ -17,6 +17,7 @@ public static class DependencyInjection
             options.LogTo(Console.WriteLine, LogLevel.Information);
             options.EnableDetailedErrors();
         });
+        services.AddTransient<Seed>();
         
         return services;
     }
