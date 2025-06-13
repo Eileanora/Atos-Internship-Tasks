@@ -24,12 +24,19 @@ public static class PokemonMapper
             BirthDate = pokemon.BirthDate
         };
     }
-    
-    public static Pokemon ToUpdateEntity(this PokemonDto pokemonDto)
+
+    public static void ToUpdateEntity(this PokemonDto pokemonDto, Pokemon pokemon)
     {
-        return new Pokemon
+        pokemon.Name = pokemonDto.Name;
+        pokemon.BirthDate = (DateTime)pokemonDto.BirthDate;
+    }
+    
+    public static PokemonDto ToUpdateDto(this PokemonDto pokemonDto)
+    {
+        return new PokemonDto
         {
             Name = pokemonDto.Name ?? string.Empty,
+            BirthDate = (DateTime)pokemonDto.BirthDate,
         };
     }
     

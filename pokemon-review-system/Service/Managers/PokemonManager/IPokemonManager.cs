@@ -1,15 +1,16 @@
 ﻿using Domain.Models;
+using Service.Common.ErrorAndResults;
 using Service.DTOs;
 
 namespace Service.Managers.PokemonManager;
 
 public interface IPokemonManager
 {
-    Task<IEnumerable<PokemonDto>> GetAllAsync();
-    Task<PokemonDto?> GetByIdAsync(int id);
-    Task<(PokemonDto?, string)> AddAsync(PokemonDto pokemon);
-    Task<(PokemonDto?, string)> UpdateAsync(PokemonDto pokemon);
-    Task<bool> DeleteAsync(PokemonDto pokemon);
-    Task<Decimal> GetPokemonRatingAsync(int pokemonId);
+    Task<Result<IEnumerable<PokemonDto>>> GetAllAsync();
+    Task<Result<PokemonDto>> GetByIdAsync(int id);
+    Task<Result<PokemonDto>> AddAsync(PokemonDto pokemon);
+    Task<Result<PokemonDto>> UpdateAsync(PokemonDto pokemon);
+    Task<Result> DeleteAsync(PokemonDto pokemon);
+    Task<Result<decimal>> GetPokemonRatingAsync(int pokemonId);
     
 }

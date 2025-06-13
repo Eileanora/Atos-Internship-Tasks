@@ -1,81 +1,98 @@
-﻿using System.Reflection.Metadata;
-using Domain.Models;
+﻿using FluentValidation;
+using FluentValidation.Internal;
+using Service.Common.Constants;
+using Service.Common.ErrorAndResults;
 using Service.DTOs;
-using Service.Helpers.Constants;
 using Service.Interfaces;
 using Service.Mappers;
 
 namespace Service.Managers.PokemonManager;
 
-public class PokemonManager(IPokemonRepository pokemonRepository) : IPokemonManager
+public class PokemonManager(
+    IUnitOfWork unitOfWork,
+    IValidator<PokemonDto> pokemonValidator) : IPokemonManager
 {
-    public async Task<IEnumerable<PokemonDto>> GetAllAsync()
+    public async Task<Result<IEnumerable<PokemonDto>>> GetAllAsync()
     {
-        var pokemons = await pokemonRepository.GetAllAsync();
-        return pokemons.Select(p => p.ToListDto());
+        var pokemons = await unitOfWork.PokemonRepository.GetAllAsync();
+        return Result<IEnumerable<PokemonDto>>.Success(pokemons.Select(p => p.ToListDto()));
     }
 
-    public async Task<PokemonDto?> GetByIdAsync(int id)
+    public async Task<Result<PokemonDto>> GetByIdAsync(int id)
     {
-        var pokemon = await pokemonRepository.GetByIdAsync(id);
+        var pokemon = await unitOfWork.PokemonRepository.GetByIdAsync(id);
         if (pokemon == null)
-            return null;
-        return pokemon.ToDetailDto();
+            return Result<PokemonDto>.Failure(ErrorMessages.NotFound);
+        return Result<PokemonDto>.Success(pokemon.ToDetailDto());
     }
 
-    public async Task<(PokemonDto?, string)> AddAsync(PokemonDto pokemon)
+    public async Task<Result<PokemonDto>> AddAsync(PokemonDto pokemon)
     {
-        var nameExists = await pokemonRepository.CheckNameUniqueAsync(pokemon.Name);
-        if (nameExists)
-            return (null, "Pokemon name already exists");
-
+        var validationResult = await pokemonValidator.ValidateAsync(pokemon,
+            options => options.IncludeRuleSets("CreateBusiness"));
+        if (!validationResult.IsValid)
+        {
+            var errorMessage = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+            return Result<PokemonDto>.Failure(new Error("ValidationError", errorMessage));
+        }
+        
         var newPokemon = pokemon.ToEntity();
-        await pokemonRepository.AddAsync(newPokemon);
+        await unitOfWork.PokemonRepository.AddAsync(newPokemon);
 
-        var result = await pokemonRepository.SaveChangesAsync();
-        if (!result)
-            return (null, ErrorMessages.InternalServerError);
+        var result = await unitOfWork.SaveChangesAsync();
+        if (result <= 0)
+            return Result<PokemonDto>.Failure(ErrorMessages.InternalServerError);
 
-        return (newPokemon.ToDetailDto(), string.Empty);
+        return Result<PokemonDto>.Success(newPokemon.ToDetailDto());
     }
 
-    public async Task<(PokemonDto?, string)> UpdateAsync(PokemonDto pokemon)
+    public async Task<Result<PokemonDto>> UpdateAsync(PokemonDto pokemon)
     {
-        var pokemonExists = await pokemonRepository.GetByIdAsync((int)pokemon.Id);
+        var context= new ValidationContext<PokemonDto>(
+            pokemon,
+            new PropertyChain(),
+            new RulesetValidatorSelector(new [] {"UpdateBusiness"}))
+        {
+            RootContextData = {["authorId"] = pokemon.Id }
+        };
+
+        var validationResult = await pokemonValidator.ValidateAsync(context);
+
+        if (!validationResult.IsValid)
+        {
+            var errorMessage = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+            return Result<PokemonDto>.Failure(new Error("ValidationError", errorMessage));
+        }
         
-        if (pokemonExists == null)
-            return (null, ErrorMessages.NotFound);
-        
-        var nameExists = await pokemonRepository.CheckNameUniqueAsync(pokemon.Name);
-        if (nameExists)
-            return (null, "Pokemon name already exists");
+        unitOfWork.PokemonRepository.UpdateAsync(pokemon.ToEntity()); 
 
-        var updatedPokemon = pokemon.ToUpdateEntity();
-        pokemonRepository.UpdateAsync(updatedPokemon);
+        var result = await unitOfWork.SaveChangesAsync();
+        if (result <= 0)
+            return Result<PokemonDto>.Failure(ErrorMessages.InternalServerError);
 
-        var result = await pokemonRepository.SaveChangesAsync();
-        if (!result)
-            return (null, ErrorMessages.InternalServerError);
-
-        return (updatedPokemon.ToDetailDto(), string.Empty);
+        return Result<PokemonDto>.Success(pokemon);
     }
 
-    public async Task<bool> DeleteAsync(PokemonDto pokemon)
+    public async Task<Result> DeleteAsync(PokemonDto pokemon)
     {
-        var pokemonExists = pokemonRepository.GetByIdAsync((int)pokemon.Id).Result;
+        var pokemonExists = await unitOfWork.PokemonRepository.GetByIdAsync((int)pokemon.Id);
         if (pokemonExists == null)
-            return false;
+            return Result.Failure(ErrorMessages.NotFound);
 
-        pokemonRepository.DeleteAsync(pokemonExists);
-        return await pokemonRepository.SaveChangesAsync();
+        unitOfWork.PokemonRepository.DeleteAsync(pokemonExists);
+        var result = await unitOfWork.SaveChangesAsync();
+        if (result <= 0)
+            return Result.Failure(ErrorMessages.InternalServerError);
+        return Result.Success();
     }
 
-    public async Task<decimal> GetPokemonRatingAsync(int pokemonId)
+    public async Task<Result<decimal>> GetPokemonRatingAsync(int pokemonId)
     {
-        var pokemonExists = await pokemonRepository.ExistsAsync(pokemonId);
+        var pokemonExists = await unitOfWork.PokemonRepository.ExistsAsync(pokemonId);
         if (!pokemonExists)
-            return -500;
+            return Result<decimal>.Failure(ErrorMessages.NotFound);
         
-        return await pokemonRepository.GetPokemonRatingAsync(pokemonId);
+        var rating = await unitOfWork.PokemonRepository.GetPokemonRatingAsync(pokemonId);
+        return Result<decimal>.Success(rating);
     }
 }

@@ -20,6 +20,7 @@ public static class DependencyInjection
             options.EnableDetailedErrors();
         });
         services.AddTransient<Seed>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPokemonRepository, PokemonRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();

@@ -6,6 +6,5 @@ public interface IBaseRepository<TEntity> : IReadOnlyBaseRepository<TEntity> whe
 {
     Task<TEntity> AddAsync(TEntity entity);
     TEntity UpdateAsync(TEntity entity);
-    Task<bool> SaveChangesAsync();
     void DeleteAsync(TEntity entity);
 }
