@@ -1,7 +1,9 @@
 using Infrastructure;
 using Infrastructure.Data;
 using Service;
+using WebApi;
 using WebApi.Helpers;
+using WebApi.Helpers.ExceptionHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,7 @@ builder.Services.AddControllers(options =>
 });
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddServiceLayer();
+builder.Services.AddApiLayer();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -39,6 +42,8 @@ void SeedData(IHost app)
 app.UseHttpsRedirection();
 app.UseSwagger();
 app.MapControllers();
-
+app.UseExceptionHandler();
 
 app.Run();
+
+
