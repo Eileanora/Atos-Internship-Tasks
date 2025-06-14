@@ -29,7 +29,7 @@ public class PokemonManager(
     public async Task<Result<PokemonDto>> AddAsync(PokemonDto pokemon)
     {
         var validationResult = await pokemonValidator.ValidateAsync(pokemon,
-            options => options.IncludeRuleSets("CreateBusiness"));
+            options => options.IncludeRuleSets("input", "CreateBusiness"));
         if (!validationResult.IsValid)
         {
             var errorMessage = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
@@ -53,7 +53,7 @@ public class PokemonManager(
             new PropertyChain(),
             new RulesetValidatorSelector(new [] {"UpdateBusiness"}))
         {
-            RootContextData = {["authorId"] = pokemon.Id }
+            RootContextData = {["pokemonId"] = pokemon.Id }
         };
 
         var validationResult = await pokemonValidator.ValidateAsync(context);
@@ -64,7 +64,10 @@ public class PokemonManager(
             return Result<PokemonDto>.Failure(new Error("ValidationError", errorMessage));
         }
         
-        unitOfWork.PokemonRepository.UpdateAsync(pokemon.ToEntity()); 
+        var pokemonEntity = await unitOfWork.PokemonRepository.GetByIdAsync((int)pokemon.Id);
+        pokemonEntity.UpdateEntityFromDto(pokemon);
+        
+        unitOfWork.PokemonRepository.UpdateAsync(pokemonEntity); 
 
         var result = await unitOfWork.SaveChangesAsync();
         if (result <= 0)

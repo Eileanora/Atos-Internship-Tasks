@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Data;
+using Infrastructure.Interceptors;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,11 +13,14 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<DataContext>(options =>
+        services.AddSingleton<UpdateAuditFieldsInterceptor>();
+        services.AddDbContext<DataContext>((sp, options) =>
         {
+            var auditInterceptor = sp.GetRequiredService<UpdateAuditFieldsInterceptor>();
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+            options.AddInterceptors(auditInterceptor);
             options.EnableSensitiveDataLogging();
-            options.LogTo(Console.WriteLine, LogLevel.Information);
+            // options.LogTo(Console.WriteLine, LogLevel.Information);
             options.EnableDetailedErrors();
         });
         services.AddTransient<Seed>();

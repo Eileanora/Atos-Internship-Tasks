@@ -10,7 +10,7 @@ internal class PokemonRepository(DataContext context) : BaseRepository<Pokemon>(
     public async Task<Pokemon?> GetByNameAsync(string name)
     {
         return await context.Pokemons
-            .FirstOrDefaultAsync(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefaultAsync(p => p.Name.Equals(name.ToLower()));
     }
 
     public async Task<decimal> GetPokemonRatingAsync(int id)
@@ -27,13 +27,14 @@ internal class PokemonRepository(DataContext context) : BaseRepository<Pokemon>(
     public async Task<bool> CheckNameUniqueAsync(string name)
     {
         return !await context.Pokemons
+            .AsNoTracking()
             .AnyAsync(p => p.Name.ToLower() == name.ToLower());
     }
 
     public async Task<Pokemon?> GetByIdAsync(int id)
     {
         return await context.Pokemons
-            .FirstOrDefaultAsync(p => p.Id == id);
+            .FindAsync(id);
     }
     
     public async Task<bool> ExistsAsync(int id)

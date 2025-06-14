@@ -7,7 +7,7 @@ namespace WebApi.Helpers.Validation;
 
 public static class ValidationHelper
 {
-    public static async Task<Result> ValidateAsync<T>(IValidator<T> validator, T dto, string ruleSet = "Input")
+    public static async Task<Result> ValidateAndReportAsync<T>(IValidator<T> validator, T dto, string ruleSet = "Input")
     {
         var validationResult = await validator.ValidateAsync(
             dto,
@@ -21,19 +21,19 @@ public static class ValidationHelper
         return Result.Success();
     }
 
-    public static async Task<IActionResult?> ValidateAndReportAsync<T>(this ControllerBase controller, IValidator<T> validator, T dto, string ruleSet = "Input")
-    {
-        var validationResult = await validator.ValidateAsync(
-            dto,
-            options => options.IncludeRuleSets(ruleSet)
-        );
-        if (!validationResult.IsValid)
-        {
-            validationResult.AddToModelState(controller.ModelState);
-            return controller.ValidationProblem(controller.ModelState);
-        }
-        return null;
-    }
+    // public static async Task<IActionResult?> ValidateAndReportAsync<T>(this ControllerBase controller, IValidator<T> validator, T dto, string ruleSet = "Input")
+    // {
+    //     var validationResult = await validator.ValidateAsync(
+    //         dto,
+    //         options => options.IncludeRuleSets(ruleSet)
+    //     );
+    //     if (!validationResult.IsValid)
+    //     {
+    //         validationResult.AddToModelState(controller.ModelState);
+    //         return controller.ValidationProblem(controller.ModelState);
+    //     }
+    //     return null;
+    // }
 }
 
 

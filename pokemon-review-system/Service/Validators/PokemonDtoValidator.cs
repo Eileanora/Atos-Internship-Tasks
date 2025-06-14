@@ -38,9 +38,9 @@ public class PokemonDtoValidator : AbstractValidator<PokemonDto>
             RuleFor(p => p)
                 .MustAsync(async (x, _, context, _) =>
                 {
-                    var nameExists = await unitOfWork.PokemonRepository.CheckNameUniqueAsync(x.Name);
+                    var nameExists = await unitOfWork.PokemonRepository.GetByNameAsync(x.Name);
                     var pokemonId = (int)context.RootContextData["pokemonId"];
-                    return nameExists || (nameExists && x.Id == pokemonId);
+                    return nameExists == null || nameExists.Id == pokemonId;
                 })
                 .WithMessage(p => string.Format(CommonValidationErrorMessages.NameExists, p.Name));
         });

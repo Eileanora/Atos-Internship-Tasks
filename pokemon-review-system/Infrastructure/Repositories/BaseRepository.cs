@@ -17,7 +17,7 @@ public class BaseRepository<TEntity>(DataContext context) : ReadOnlyBaseReposito
 
     public TEntity UpdateAsync(TEntity entity)
     {
-        context.Set<TEntity>().Update(entity);
+        context.Entry(entity).State = EntityState.Modified;
         return entity;
     }
 

@@ -56,14 +56,15 @@ public class PokemonController(IPokemonManager pokemonManager,
             return pokemonResult.ToActionResult();
 
         var pokemonToPatch = pokemonResult.Value.ToUpdateDto();
-        var validationProblem = await this.HandlePatchAsync(pokemonValidator, pokemonToPatch, patchDoc);
-        if (validationProblem != null)
-            return validationProblem;
+        var (patchedDto, validationResult) = this.HandlePatch(pokemonToPatch, patchDoc);
+        if (!validationResult.IsSuccess)
+            return validationResult.ToActionResult();
+        
+        var inputValid = await ValidationHelper.ValidateAndReportAsync(pokemonValidator, patchedDto, "input");
+        if (!inputValid.IsSuccess)
+            return inputValid.ToActionResult();
 
-        var inputValid = await this.ValidateAndReportAsync(pokemonValidator, pokemonToPatch, "input");
-        if (inputValid != null)
-            return inputValid;
-
+        patchedDto.Id = id;
         var result = await pokemonManager.UpdateAsync(pokemonToPatch);
         if (!result.IsSuccess)
             return result.ToActionResult();

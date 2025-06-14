@@ -12,11 +12,12 @@ public static class JsonPatchInputFormatter
         var builder = new ServiceCollection()
             .AddLogging()
             .AddMvc()
-            .AddNewtonsoftJson(setupAction =>
-            {
-                setupAction.SerializerSettings.ContractResolver =
-                    new CamelCasePropertyNamesContractResolver();
-            })
+            // .AddNewtonsoftJson(setupAction =>
+            // {
+            //     setupAction.SerializerSettings.ContractResolver =
+            //         new CamelCasePropertyNamesContractResolver();
+            // })
+            .AddNewtonsoftJson()
             .Services.BuildServiceProvider();
 
         return builder

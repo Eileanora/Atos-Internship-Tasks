@@ -25,9 +25,15 @@ public static class PokemonMapper
         };
     }
 
-    public static void ToUpdateEntity(this PokemonDto pokemonDto, Pokemon pokemon)
+    // public static void ToUpdateEntity(this PokemonDto pokemonDto, Pokemon pokemon)
+    // {
+    //     pokemon.Name = pokemonDto.Name;
+    //     pokemon.BirthDate = (DateTime)pokemonDto.BirthDate;
+    // }
+    
+    public static void UpdateEntityFromDto(this Pokemon pokemon, PokemonDto pokemonDto)
     {
-        pokemon.Name = pokemonDto.Name;
+        pokemon.Name = pokemonDto.Name ?? string.Empty;
         pokemon.BirthDate = (DateTime)pokemonDto.BirthDate;
     }
     
@@ -42,10 +48,13 @@ public static class PokemonMapper
     
     public static Pokemon ToEntity(this PokemonDto pokemonDto)
     {
-        return new Pokemon
+        var pokemon = new Pokemon
         {
             Name = pokemonDto.Name ?? string.Empty,
             BirthDate = (DateTime)pokemonDto.BirthDate
         };
+        if (pokemonDto.Id != null)
+            pokemon.Id = (int)pokemonDto.Id;
+        return pokemon;
     }
 }
