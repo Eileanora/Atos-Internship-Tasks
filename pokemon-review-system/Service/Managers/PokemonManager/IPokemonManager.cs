@@ -1,6 +1,6 @@
 ﻿using Domain.Models;
 using Service.Common.ErrorAndResults;
-using Service.DTOs;
+using Shared.DTOs;
 
 namespace Service.Managers.PokemonManager;
 

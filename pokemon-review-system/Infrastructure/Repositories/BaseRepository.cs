@@ -2,8 +2,6 @@
 using Infrastructure.Data;
 using Infrastructure.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Service.Common.ResourceParameters;
-using Service.DTOs;
 using Service.Interfaces;
 
 namespace Infrastructure.Repositories;

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Service.DTOs;
+using Shared.DTOs;
 using Service.Managers.CategoryManager;
 
 namespace WebApi.Controllers;

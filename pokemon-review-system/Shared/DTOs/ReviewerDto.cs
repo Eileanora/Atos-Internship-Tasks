@@ -1,4 +1,4 @@
-﻿namespace Service.DTOs;
+﻿namespace Shared.DTOs;
 
 public class ReviewerDto : BaseDto
 {

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Service.DTOs;
+using Shared.DTOs;
 using Service.Managers.PokemonManager;
 using Service.Mappers;
 using WebApi.Helpers.Extensions;

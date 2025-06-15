@@ -1,4 +1,6 @@
-﻿using Infrastructure.Data;
+﻿using Domain.Models;
+using Infrastructure.Data;
+using Infrastructure.Helpers;
 using Infrastructure.Interceptors;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IPokemonRepository, PokemonRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
+        services.AddScoped<ISortHelper<Pokemon>, SortHelper<Pokemon>>();
         // services.AddScoped<>();
         return services;
     }

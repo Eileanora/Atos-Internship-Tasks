@@ -1,4 +1,4 @@
-﻿using Service.DTOs;
+﻿using Shared.DTOs;
 using Domain.Models;
 
 namespace Service.Mappers;

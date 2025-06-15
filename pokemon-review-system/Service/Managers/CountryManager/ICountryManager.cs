@@ -1,4 +1,4 @@
-﻿using Service.DTOs;
+﻿using Shared.DTOs;
 
 namespace Service.Managers.CountryManager;
 

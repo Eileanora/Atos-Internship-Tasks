@@ -3,7 +3,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Common.ErrorAndResults;
-using Service.DTOs;
+using Shared.DTOs;
 
 namespace WebApi.Helpers.Validation
 {

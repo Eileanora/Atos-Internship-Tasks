@@ -1,5 +1,5 @@
 ﻿using Domain.Models;
-using Service.DTOs;
+using Shared.DTOs;
 using Service.Interfaces;
 using Service.Mappers;
 

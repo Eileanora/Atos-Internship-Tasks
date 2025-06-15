@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using Service.DTOs;
+using Shared.DTOs;
 using Service.Managers.CategoryManager;
 using Service.Managers.CountryManager;
 using Service.Managers.PokemonManager;
+using Service.Validators;
 
 namespace Service;
 
@@ -14,7 +15,7 @@ public static class DependencyInjection
         services.AddScoped<IPokemonManager, PokemonManager>();
         services.AddScoped<ICountryManager, CountryManager>();
         services.AddScoped<ICategoryManager, CategoryManager>();
-        services.AddValidatorsFromAssemblyContaining<PokemonDto>();
+        services.AddValidatorsFromAssemblyContaining<PokemonDtoValidator>();
 
         return services;
     }
