@@ -9,6 +9,9 @@ public class OwnerDtoValidator : AbstractValidator<OwnerDto>
 {
     public OwnerDtoValidator(IUnitOfWork unitOfWork)
     {
+        RuleLevelCascadeMode = CascadeMode.Stop;
+        ClassLevelCascadeMode = CascadeMode.Stop;
+        
         RuleSet("input", () =>
         {
             RuleFor(x => x.FirstName)

@@ -10,29 +10,25 @@ public class PokemonDtoValidator : AbstractValidator<PokemonDto>
     public PokemonDtoValidator(
         IUnitOfWork unitOfWork)
     {
-        Func<IEnumerable<int>, CancellationToken, Task<bool>> categoriesExistRule = async (categoriesId, _) =>
-        {
-            return await unitOfWork.CategoryRepository.CheckCategoriesExistAsync(categoriesId);
-        };
+        RuleLevelCascadeMode = CascadeMode.Stop;
+        ClassLevelCascadeMode = CascadeMode.Stop;   
+        
         RuleSet("Input", () =>
         {
             RuleFor(p => p.Name)
-                .NotNull();
-            RuleFor(p => p.BirthDate)
-                .NotNull();
-            RuleFor(p => p.CategoriesId)
-                .NotNull();
-            
-            RuleFor(p => p.Name)
-                .NotEmpty().WithMessage(string.Format(CommonValidationErrorMessages.Required, "Name"))
-                .MaximumLength(100).WithMessage(string.Format(CommonValidationErrorMessages.StringLength, "Name", 100)); 
+                .NotNull().WithMessage(string.Format(CommonValidationErrorMessages.Required, nameof(PokemonDto.Name)))
+                .NotEmpty().WithMessage(string.Format(CommonValidationErrorMessages.NotEmpty, nameof(PokemonDto.Name)))
+                .MaximumLength(50).WithMessage(string.Format(CommonValidationErrorMessages.StringLength, nameof(PokemonDto.Name), 50));
             
             RuleFor(p => p.BirthDate)
-                .NotEmpty().WithMessage(string.Format(CommonValidationErrorMessages.Required, "BirthDate"))
+                .NotEmpty().WithMessage(string.Format(CommonValidationErrorMessages.Required, nameof(PokemonDto.BirthDate)))
                 .LessThanOrEqualTo(DateTime.Today).WithMessage(CommonValidationErrorMessages.BirthDateFuture);
 
             RuleFor(p => p.CategoriesId)
-                .NotEmpty().WithMessage(string.Format(CommonValidationErrorMessages.Required, "CategoriesId"));
+                .NotNull().WithMessage(string.Format(CommonValidationErrorMessages.Required,
+                    nameof(PokemonDto.CategoriesId)))
+                .NotEmpty().WithMessage(string.Format(CommonValidationErrorMessages.Required,
+                    nameof(PokemonDto.CategoriesId)));
         });
         
         RuleSet("CreateBusiness", () =>

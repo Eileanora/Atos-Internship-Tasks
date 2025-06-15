@@ -9,6 +9,9 @@ public class ReviewerDtoValidator : AbstractValidator<ReviewerDto>
 {
     public ReviewerDtoValidator(IUnitOfWork unitOfWork)
     {
+        RuleLevelCascadeMode = CascadeMode.Stop;
+        ClassLevelCascadeMode = CascadeMode.Stop;
+        
         RuleSet("Input", () =>
         {
             RuleFor(x => x.FirstName)
