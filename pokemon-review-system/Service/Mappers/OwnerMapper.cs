@@ -1,12 +1,13 @@
 ﻿using Domain.Models;
 using Shared.DTOs;
+using Shared.ResourceParameters;
 
 namespace Service.Mappers;
 
 public static class OwnerMapper
 {
     // ToListDto, ToDetailDto, ToUpdateDto, ToCreatedDto, ToEntity, UpdateEntityFromDto
-    public static OwnerDto ToListDto(this Owner owner)
+    private static OwnerDto ToListDto(this Owner owner)
     {
         return new OwnerDto
         {
@@ -15,6 +16,21 @@ public static class OwnerMapper
             LastName = owner.LastName,
             Gym = owner.Gym
         };
+    }
+    
+    public static PagedList<OwnerDto> ToListDto(this PagedList<Owner> owners)
+    {
+        var count = owners.TotalCount;
+        var pageNumber = owners.CurrentPage;
+        var pageSize = owners.PageSize;
+        var totalPages = owners.TotalPages;
+        return new PagedList<OwnerDto>(
+            owners.Select(s => ToListDto(s)).ToList(),
+            count,
+            pageNumber,
+            pageSize,
+            totalPages
+        );
     }
     
     public static OwnerDto ToDetailDto(this Owner owner)

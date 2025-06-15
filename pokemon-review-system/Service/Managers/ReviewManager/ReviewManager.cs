@@ -4,6 +4,7 @@ using Service.Interfaces;
 using Service.Mappers;
 using Service.Common.ErrorAndResults;
 using Shared.DTOs;
+using Shared.ResourceParameters;
 
 namespace Service.Managers.ReviewManager;
 
@@ -47,5 +48,13 @@ public class ReviewManager(
         if (result <= 0)
             return Result.Failure(ErrorMessages.InternalServerError);
         return Result.Success();
+    }
+
+    public async Task<Result<PagedList<ReviewDto>>> GetAllAsync(ReviewResourceParameters resourceParameters)
+    {
+        if (resourceParameters.PokemonId == null && resourceParameters.ReviewerId == null)
+            return Result<PagedList<ReviewDto>>.Success(new PagedList<ReviewDto>(new List<ReviewDto>(), 0, 0, 0));
+        var pagedReviews = await unitOfWork.ReviewRepository.GetAllAsync(resourceParameters);
+        return Result<PagedList<ReviewDto>>.Success(pagedReviews.ToListDto());
     }
 }

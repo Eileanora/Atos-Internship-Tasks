@@ -1,5 +1,6 @@
 ﻿using Service.Common.ErrorAndResults;
 using Shared.DTOs;
+using Shared.ResourceParameters;
 
 namespace Service.Managers.ReviewManager;
 
@@ -8,4 +9,5 @@ public interface IReviewManager
     Task<Result<ReviewDto>> GetByIdAsync(int id);
     Task<Result<ReviewDto>> AddAsync(ReviewDto reviewDto);
     Task<Result> DeleteAsync(ReviewDto reviewDto);
+    Task<Result<PagedList<ReviewDto>>> GetAllAsync(ReviewResourceParameters resourceParameters);
 }

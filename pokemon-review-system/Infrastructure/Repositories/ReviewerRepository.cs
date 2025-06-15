@@ -2,11 +2,14 @@
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Service.Interfaces;
+using Shared.ResourceParameters;
+using Infrastructure.Helpers;
 
 namespace Infrastructure.Repositories;
 
 public class ReviewerRepository(
-    DataContext context)
+    DataContext context,
+    ISortHelper<Reviewer> sortHelper)
     : BaseRepository<Reviewer>(context), IReviewerRepository
 {
     public async Task<Reviewer?> GetByIdAsync(int id)
@@ -35,5 +38,31 @@ public class ReviewerRepository(
     {
         return await context.Reviewers
             .FirstOrDefaultAsync(r => r.FirstName == firstName && r.LastName == lastName);
+    }
+
+    public async Task<PagedList<Reviewer>> GetAllAsync(ReviewerResourceParameters resourceParameters)
+    {
+        var collection = context.Reviewers.AsQueryable();
+        if (!string.IsNullOrWhiteSpace(resourceParameters.SearchQuery))
+        {
+            var searchQuery = resourceParameters.SearchQuery.Trim().ToLower();
+            collection = collection.Where(r => r.FirstName.ToLower().Contains(searchQuery) 
+                                               || r.LastName.ToLower().Contains(searchQuery));
+        }
+        if (!string.IsNullOrWhiteSpace(resourceParameters.FirstName))
+        {
+            var firstName = resourceParameters.FirstName.Trim().ToLower();
+            collection = collection.Where(r => r.FirstName.ToLower().Equals(firstName));
+        }
+        if (!string.IsNullOrWhiteSpace(resourceParameters.LastName))
+        {
+            var lastName = resourceParameters.LastName.Trim().ToLower();
+            collection = collection.Where(r => r.LastName.ToLower().Equals(lastName));
+        }
+        var sortedList = sortHelper.ApplySort(collection, resourceParameters.OrderBy);
+        return await CreateAsync(
+            sortedList,
+            resourceParameters.PageNumber,
+            resourceParameters.PageSize);
     }
 }

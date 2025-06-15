@@ -36,6 +36,10 @@ public static class DependencyInjection
         services.AddScoped<IReviewerRepository, ReviewerRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped<ISortHelper<Pokemon>, SortHelper<Pokemon>>();
+        services.AddScoped<ISortHelper<Owner>, SortHelper<Owner>>();
+        services.AddScoped<ISortHelper<Reviewer>, SortHelper<Reviewer>>();
+        services.AddScoped<ISortHelper<Review>, SortHelper<Review>>();
+
         // services.AddScoped<>();
         return services;
     }

@@ -1,29 +1,34 @@
 ﻿using Domain.Models;
 using Shared.DTOs;
+using Shared.ResourceParameters;
 
 namespace Service.Mappers;
 
 public static class ReviewerMapper
 {
-    public static ReviewerDto ToDto(this Reviewer reviewer)
+    private static ReviewerDto ToListDto(this Reviewer reviewer)
     {
         return new ReviewerDto
         {
             Id = reviewer.Id,
             FirstName = reviewer.FirstName,
             LastName = reviewer.LastName,
-            ReviewCount = reviewer.Reviews?.Count
         };
     }
-
-    public static ReviewerDto ToListDto(this Reviewer reviewer)
+    
+    public static PagedList<ReviewerDto> ToListDto(this PagedList<Reviewer> reviewers)
     {
-        return new ReviewerDto
-        {
-            Id = reviewer.Id,
-            FirstName = reviewer.FirstName,
-            LastName = reviewer.LastName,
-        };
+        var count = reviewers.TotalCount;
+        var pageNumber = reviewers.CurrentPage;
+        var pageSize = reviewers.PageSize;
+        var totalPages = reviewers.TotalPages;
+        return new PagedList<ReviewerDto>(
+            reviewers.Select(s => ToListDto(s)).ToList(),
+            count,
+            pageNumber,
+            pageSize,
+            totalPages
+        );
     }
 
     public static ReviewerDto ToDetailDto(this Reviewer reviewer)

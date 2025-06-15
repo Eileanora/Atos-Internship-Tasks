@@ -1,6 +1,6 @@
 ﻿using Domain.Models;
-using Infrastructure.Helpers;
-using Service.Common.ResourceParameters;
+using Shared.ResourceParameters;
+
 
 namespace Service.Interfaces;
 

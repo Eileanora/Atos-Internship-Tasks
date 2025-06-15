@@ -1,12 +1,13 @@
 ﻿using Domain.Models;
 using Service.Common.ErrorAndResults;
 using Shared.DTOs;
+using Shared.ResourceParameters;
 
 namespace Service.Managers.PokemonManager;
 
 public interface IPokemonManager
 {
-    Task<Result<IEnumerable<PokemonDto>>> GetAllAsync();
+    Task<Result<PagedList<PokemonDto>>> GetAllAsync(PokemonResourceParameters resourceParameters);
     Task<Result<PokemonDto>> GetByIdAsync(int id);
     Task<Result<PokemonDto>> AddAsync(PokemonDto pokemon);
     Task<Result<PokemonDto>> UpdateAsync(PokemonDto pokemon);

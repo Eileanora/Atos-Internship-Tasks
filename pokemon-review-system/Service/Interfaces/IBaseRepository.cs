@@ -1,5 +1,4 @@
 ﻿using Domain.Models;
-using Service.Common.ResourceParameters;
 
 namespace Service.Interfaces;
 

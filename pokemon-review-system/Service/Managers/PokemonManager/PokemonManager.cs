@@ -5,6 +5,7 @@ using Service.Common.ErrorAndResults;
 using Shared.DTOs;
 using Service.Interfaces;
 using Service.Mappers;
+using Shared.ResourceParameters;
 
 namespace Service.Managers.PokemonManager;
 
@@ -12,10 +13,11 @@ public class PokemonManager(
     IUnitOfWork unitOfWork,
     IValidator<PokemonDto> pokemonValidator) : IPokemonManager
 {
-    public async Task<Result<IEnumerable<PokemonDto>>> GetAllAsync()
+    public async Task<Result<PagedList<PokemonDto>>> GetAllAsync(
+        PokemonResourceParameters resourceParameters)
     {
-        var pokemons = await unitOfWork.PokemonRepository.GetAllAsync();
-        return Result<IEnumerable<PokemonDto>>.Success(pokemons.Select(p => p.ToListDto()));
+        var pokemons = await unitOfWork.PokemonRepository.GetAllAsync(resourceParameters);
+        return Result<PagedList<PokemonDto>>.Success(pokemons.ToListDto());
     }
 
     public async Task<Result<PokemonDto>> GetByIdAsync(int id)

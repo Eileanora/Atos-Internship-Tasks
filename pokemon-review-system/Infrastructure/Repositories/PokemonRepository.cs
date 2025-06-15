@@ -2,7 +2,7 @@
 using Infrastructure.Data;
 using Infrastructure.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Service.Common.ResourceParameters;
+using Shared.ResourceParameters;
 using Service.Interfaces;
 
 namespace Infrastructure.Repositories;
@@ -54,8 +54,14 @@ internal class PokemonRepository(
         var collection = context.Pokemons as IQueryable<Pokemon>;
         if (!string.IsNullOrWhiteSpace(resourceParameters.SearchQuery))
         {
-            var searchQuery = resourceParameters.SearchQuery.Trim();
+            var searchQuery = resourceParameters.SearchQuery.Trim().ToLower();
             collection = collection.Where(p => p.Name.Contains(searchQuery));
+        } 
+        
+        if (!string.IsNullOrWhiteSpace(resourceParameters.Name))
+        {
+            var pokemonName = resourceParameters.Name.Trim().ToLower();
+            collection = collection.Where(p => p.Name.Equals(pokemonName));
         }
         
         var sortedList = sortHelper.ApplySort(collection, resourceParameters.OrderBy);

@@ -1,8 +1,8 @@
 ﻿using Domain.Models;
 using Infrastructure.Data;
-using Infrastructure.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Service.Interfaces;
+using Shared.ResourceParameters;
 
 namespace Infrastructure.Repositories;
 

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Managers.ReviewerManager;
 using Shared.DTOs;
+using Shared.ResourceParameters;
 using WebApi.Helpers.Extensions;
+using WebApi.Helpers.PaginationHelper;
 using WebApi.Helpers.Validation;
 
 namespace WebApi.Controllers;
@@ -12,15 +14,19 @@ namespace WebApi.Controllers;
 [ApiController]
 public class ReviewerController(
     IReviewerManager reviewerManager,
-    IValidator<ReviewerDto> reviewerValidator)
+    IValidator<ReviewerDto> reviewerValidator,
+    IPaginationHelper<ReviewerDto, ReviewerResourceParameters> paginationHelper)
     : ControllerBase
 {
     // GET ALL ASYNC
     [HttpGet(Name = "GetAllReviewers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAllAsync()
-    {
-        var reviewers = await reviewerManager.GetAllAsync();
+    public async Task<IActionResult> GetAllAsync(
+        [FromQuery] ReviewerResourceParameters resourceParameters)    {
+        var reviewers = await reviewerManager.GetAllAsync(resourceParameters);
+        paginationHelper
+            .CreateMetaDataHeader(
+                reviewers.Value, resourceParameters, Response.Headers, Url, "GetAllReviewers");
         return reviewers.ToActionResult();
     }
 

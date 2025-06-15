@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.Managers.ReviewManager;
 using Shared.DTOs;
+using Shared.ResourceParameters;
 using WebApi.Helpers.Extensions;
+using WebApi.Helpers.PaginationHelper;
 using WebApi.Helpers.Validation;
 
 namespace WebApi.Controllers;
@@ -11,9 +13,24 @@ namespace WebApi.Controllers;
 [ApiController]
 public class ReviewController(
     IReviewManager reviewManager,
-    IValidator<ReviewDto> reviewValidator)
+    IValidator<ReviewDto> reviewValidator,
+    IPaginationHelper<ReviewDto, ReviewResourceParameters> paginationHelper)
     : ControllerBase
 {
+    // GET ALL
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllAsync([FromQuery] ReviewResourceParameters resourceParameters)
+    {
+        var result = await reviewManager.GetAllAsync(resourceParameters);
+        
+        paginationHelper.
+            CreateMetaDataHeader(
+                result.Value, resourceParameters, Response.Headers, Url, "GetAllReviews");
+        
+        return result.ToActionResult();
+    }
+    
     // GET BY ID
     [HttpGet("{id}", Name = "GetReviewById")]
     [ProducesResponseType(StatusCodes.Status200OK)]

@@ -1,11 +1,12 @@
 ﻿using Service.Common.ErrorAndResults;
 using Shared.DTOs;
+using Shared.ResourceParameters;
 
 namespace Service.Managers.OwnerManager;
 
 public interface IOwnerManager
 {
-    Task<Result<IEnumerable<OwnerDto>>> GetAllAsync();
+    Task<Result<PagedList<OwnerDto>>> GetAllAsync(OwnerResourceParameters resourceParameters);
     Task<Result<OwnerDto>> GetByIdAsync(int id);
     Task<Result<OwnerDto>> AddAsync(OwnerDto owner);
     Task<Result<OwnerDto>> UpdateAsync(OwnerDto owner);

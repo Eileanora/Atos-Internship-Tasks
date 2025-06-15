@@ -1,11 +1,12 @@
 ﻿using Domain.Models;
 using Shared.DTOs;
+using Shared.ResourceParameters;
 
 namespace Service.Mappers;
 
 public static class PokemonMapper
 {
-    public static PokemonDto ToListDto(this Pokemon pokemon)
+    private static PokemonDto ToListDto(this Pokemon pokemon)
     {
         return new PokemonDto
         {
@@ -13,6 +14,21 @@ public static class PokemonMapper
             Name = pokemon.Name,
             BirthDate = pokemon.BirthDate
         };
+    }
+    
+    public static PagedList<PokemonDto> ToListDto(this PagedList<Pokemon> pokemons)
+    {
+        var count = pokemons.TotalCount;
+        var pageNumber = pokemons.CurrentPage;
+        var pageSize = pokemons.PageSize;
+        var totalPages = pokemons.TotalPages;
+        return new PagedList<PokemonDto>(
+            pokemons.Select(s => ToListDto(s)).ToList(),
+            count,
+            pageNumber,
+            pageSize,
+            totalPages
+        );
     }
     
     public static PokemonDto ToDetailDto(this Pokemon pokemon)
@@ -30,12 +46,6 @@ public static class PokemonMapper
             CategoriesId = pokemon.PokemonCategories?.Where(pc => pc.Category != null).Select(pc => pc.Category.Id).ToList()
         };
     }
-
-    // public static void ToUpdateEntity(this PokemonDto pokemonDto, Pokemon pokemon)
-    // {
-    //     pokemon.Name = pokemonDto.Name;
-    //     pokemon.BirthDate = (DateTime)pokemonDto.BirthDate;
-    // }
     
     public static void UpdateEntityFromDto(this Pokemon pokemon, PokemonDto pokemonDto)
     {

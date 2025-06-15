@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Shared.DTOs;
 using Service.Managers.PokemonManager;
 using Service.Mappers;
+using Shared.ResourceParameters;
 using WebApi.Helpers.Extensions;
+using WebApi.Helpers.PaginationHelper;
 using WebApi.Helpers.Validation;
 
 namespace WebApi.Controllers;
@@ -12,15 +14,21 @@ namespace WebApi.Controllers;
 [Route("api/Pokemon")]
 [ApiController]
 public class PokemonController(IPokemonManager pokemonManager,
-    IValidator<PokemonDto> pokemonValidator) : ControllerBase
+    IValidator<PokemonDto> pokemonValidator,
+    IPaginationHelper<PokemonDto, PokemonResourceParameters> paginationHelper) : ControllerBase
 {
     // GET ALL ASYNC
     // TODO: add pagination and filtering (use paged list DTO)
     [HttpGet(Name = "GetAllPokemons")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAllAsync()
+    public async Task<IActionResult> GetAllAsync(
+        [FromQuery] PokemonResourceParameters resourceParameters)
     {
-        var pokemons = await pokemonManager.GetAllAsync();
+        var pokemons = await pokemonManager.GetAllAsync(resourceParameters);
+        paginationHelper
+            .CreateMetaDataHeader(
+                pokemons.Value, resourceParameters, Response.Headers, Url, "GetAllPokemons");
+        
         return pokemons.ToActionResult();
     }
     

@@ -5,6 +5,7 @@ using Service.Common.ErrorAndResults;
 using Shared.DTOs;
 using Service.Interfaces;
 using Service.Mappers;
+using Shared.ResourceParameters;
 
 namespace Service.Managers.OwnerManager;
 
@@ -14,10 +15,10 @@ public class OwnerManager(
     IValidator<Domain.Models.PokemonOwner> pokemonOwnerValidator) 
     : IOwnerManager
 {
-    public async Task<Result<IEnumerable<OwnerDto>>> GetAllAsync()
+    public async Task<Result<PagedList<OwnerDto>>> GetAllAsync(OwnerResourceParameters resourceParameters)
     {
-        var owners = await unitOfWork.OwnerRepository.GetAllAsync();
-        return Result<IEnumerable<OwnerDto>>.Success(owners.Select(o => o.ToListDto()));
+        var owners = await unitOfWork.OwnerRepository.GetAllAsync(resourceParameters);
+        return Result<PagedList<OwnerDto>>.Success(owners.ToListDto());
     }
 
     public async Task<Result<OwnerDto>> GetByIdAsync(int id)

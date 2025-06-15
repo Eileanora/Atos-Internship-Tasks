@@ -5,6 +5,7 @@ using Service.Interfaces;
 using Service.Mappers;
 using Service.Common.ErrorAndResults;
 using Shared.DTOs;
+using Shared.ResourceParameters;
 
 namespace Service.Managers.ReviewerManager;
 
@@ -13,10 +14,10 @@ public class ReviewerManager(
     IValidator<ReviewerDto> reviewerValidator)
     : IReviewerManager
 {
-    public async Task<Result<IEnumerable<ReviewerDto>>> GetAllAsync()
+    public async Task<Result<PagedList<ReviewerDto>>> GetAllAsync(ReviewerResourceParameters resourceParameters)
     {
-        var reviewers = await unitOfWork.ReviewerRepository.GetAllAsync();
-        return Result<IEnumerable<ReviewerDto>>.Success(reviewers.Select(r => r.ToListDto()));
+        var reviewers = await unitOfWork.ReviewerRepository.GetAllAsync(resourceParameters);
+        return Result<PagedList<ReviewerDto>>.Success(reviewers.ToListDto());
     }
 
     public async Task<Result<ReviewerDto>> GetByIdAsync(int id)

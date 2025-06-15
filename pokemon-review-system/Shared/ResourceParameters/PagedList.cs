@@ -1,6 +1,6 @@
-﻿using Service.Common.ResourceParameters;
+﻿using Shared.ResourceParameters;
 
-namespace Infrastructure.Helpers;
+namespace Shared.ResourceParameters;
 
 public class PagedList<TEntity> : List<TEntity>
 {

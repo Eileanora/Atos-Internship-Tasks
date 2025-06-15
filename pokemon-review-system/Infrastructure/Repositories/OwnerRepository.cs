@@ -2,10 +2,14 @@
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Service.Interfaces;
+using Shared.ResourceParameters;
+using Infrastructure.Helpers;
 
 namespace Infrastructure.Repositories;
 
-public class OwnerRepository(DataContext context) : BaseRepository<Owner>(context), IOwnerRepository
+public class OwnerRepository(DataContext context,
+    ISortHelper<Owner> sortHelper)
+    : BaseRepository<Owner>(context), IOwnerRepository
 {
     // override get by id
     public async Task<Owner?> GetByIdAsyncWithInclude(int id)
@@ -19,5 +23,44 @@ public class OwnerRepository(DataContext context) : BaseRepository<Owner>(contex
     public async Task<bool> ExistsAsync(int ownerId)
     {
         return await context.Owners.AnyAsync(o => o.Id == ownerId);
+    }
+
+    public async Task<PagedList<Owner>> GetAllAsync(OwnerResourceParameters resourceParameters)
+    {
+        var collection = context.Owners.AsQueryable();
+        if (!string.IsNullOrWhiteSpace(resourceParameters.SearchQuery))
+        {
+            var searchQuery = resourceParameters.SearchQuery.Trim().ToLower();
+            collection = collection.Where(o => o.FirstName.ToLower().Contains(searchQuery) || o.LastName.ToLower().Contains(searchQuery));
+        }
+        
+        if (!string.IsNullOrWhiteSpace(resourceParameters.FirstName))
+        {
+            var firstName = resourceParameters.FirstName.Trim().ToLower();
+            collection = collection.Where(o => o.FirstName.ToLower().Equals(firstName));
+        }
+        
+        if (!string.IsNullOrWhiteSpace(resourceParameters.LastName))
+        {
+            var lastName = resourceParameters.LastName.Trim().ToLower();
+            collection = collection.Where(o => o.LastName.ToLower().Equals(lastName));
+        }
+        
+        if (resourceParameters.CountryId.HasValue)
+        {
+            collection = collection.Where(o => o.CountryId == resourceParameters.CountryId);
+        }
+        
+        if (!string.IsNullOrWhiteSpace(resourceParameters.Gym))
+        {
+            var gym = resourceParameters.Gym.Trim().ToLower();
+            collection = collection.Where(o => o.Gym.ToLower().Contains(gym));
+        }
+        
+        var sortedList = sortHelper.ApplySort(collection, resourceParameters.OrderBy);
+        return await CreateAsync(
+            sortedList,
+            resourceParameters.PageNumber,
+            resourceParameters.PageSize);
     }
 }

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Managers.OwnerManager;
 using Shared.DTOs;
+using Shared.ResourceParameters;
 using WebApi.Helpers.Extensions;
+using WebApi.Helpers.PaginationHelper;
 using WebApi.Helpers.Validation;
 
 namespace WebApi.Controllers;
@@ -11,14 +13,19 @@ namespace WebApi.Controllers;
 [Route("api/Owners")]
 [ApiController]
 public class OwnerController(IOwnerManager ownerManager,
-    IValidator<OwnerDto> ownerValidator) : ControllerBase
+    IValidator<OwnerDto> ownerValidator,
+    IPaginationHelper<OwnerDto, OwnerResourceParameters> paginationHelper) : ControllerBase
 {
     // GET ALL ASYNC
     [HttpGet(Name = "GetAllOwners")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAllAsync()
+    public async Task<IActionResult> GetAllAsync(
+        [FromQuery] OwnerResourceParameters resourceParameters)
     {
-        var owners = await ownerManager.GetAllAsync();
+        var owners = await ownerManager.GetAllAsync(resourceParameters);
+        paginationHelper
+            .CreateMetaDataHeader(
+                owners.Value, resourceParameters, Response.Headers, Url, "GetAllOwners");
         return owners.ToActionResult();
     }
 
