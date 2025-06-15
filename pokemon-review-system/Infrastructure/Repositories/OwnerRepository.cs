@@ -8,7 +8,7 @@ namespace Infrastructure.Repositories;
 public class OwnerRepository(DataContext context) : BaseRepository<Owner>(context), IOwnerRepository
 {
     // override get by id
-    public override async Task<Owner?> GetByIdAsyncWithInclude(int id)
+    public async Task<Owner?> GetByIdAsyncWithInclude(int id)
     {
         return await context.Owners
             .Include(o => o.Country)

@@ -4,7 +4,7 @@ namespace Shared.DTOs;
 
 public class ReviewDto : BaseDto
 {
-    public string? Id { get; set; }
+    public int? Id { get; set; }
     public string? Title { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Content { get; set; }
@@ -15,7 +15,7 @@ public class ReviewDto : BaseDto
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? PokemonId { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? PokemonName { get; set; } = string.Empty;
+    public string? PokemonName { get; set; }
     public int? Rating { get; set; }
     public DateTime CreatedAt { get; set; }
 }

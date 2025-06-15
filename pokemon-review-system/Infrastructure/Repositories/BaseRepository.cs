@@ -32,11 +32,6 @@ public class BaseRepository<TEntity>(DataContext context) : ReadOnlyBaseReposito
         return await context.Set<TEntity>().FindAsync(id);
     }
 
-    public virtual async Task<TEntity?> GetByIdAsyncWithInclude(int id)
-    {
-        return await context.Set<TEntity>().FindAsync(id);
-    }
-
     protected static async Task<PagedList<TEntity>> CreateAsync(
         IQueryable<TEntity> source, int pageNumber, int pageSize)
     {

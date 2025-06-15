@@ -66,7 +66,7 @@ public static class ReviewerMapper
     {
         return new ReviewDto
         {
-            Id = review.Id.ToString(),
+            Id = review.Id,
             Title = review.Title,
             Content = review.Content,
             Rating = review.Rating,
