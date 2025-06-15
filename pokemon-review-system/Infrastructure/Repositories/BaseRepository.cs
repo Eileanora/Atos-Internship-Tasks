@@ -1,6 +1,8 @@
 ﻿using Domain.Models;
 using Infrastructure.Data;
+using Infrastructure.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Service.Common.ResourceParameters;
 using Service.DTOs;
 using Service.Interfaces;
 
@@ -26,10 +28,15 @@ public class BaseRepository<TEntity>(DataContext context) : ReadOnlyBaseReposito
     {
         context.Set<TEntity>().Remove(entity);
     }
-    
-    public async Task<bool> SaveChangesAsync()
-    {
-        return await context.SaveChangesAsync() > 0;
-    }
 
+    protected static async Task<PagedList<TEntity>> CreateAsync(
+        IQueryable<TEntity> source, int pageNumber, int pageSize)
+    {
+        var count = source.Count();
+        var items = await source
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return new PagedList<TEntity>(items, count, pageNumber, pageSize);
+    }
 }

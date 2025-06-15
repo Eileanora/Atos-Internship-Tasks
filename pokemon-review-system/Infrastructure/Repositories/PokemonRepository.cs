@@ -1,11 +1,15 @@
 ﻿using Domain.Models;
 using Infrastructure.Data;
+using Infrastructure.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Service.Common.ResourceParameters;
 using Service.Interfaces;
 
 namespace Infrastructure.Repositories;
 
-internal class PokemonRepository(DataContext context) : BaseRepository<Pokemon>(context), IPokemonRepository 
+internal class PokemonRepository(
+    DataContext context,
+    ISortHelper<Pokemon> sortHelper) : BaseRepository<Pokemon>(context), IPokemonRepository 
 {
     public async Task<Pokemon?> GetByNameAsync(string name)
     {
@@ -36,7 +40,24 @@ internal class PokemonRepository(DataContext context) : BaseRepository<Pokemon>(
         return await context.Pokemons
             .FindAsync(id);
     }
-    
+
+    public async Task<PagedList<Pokemon>> GetAllAsync(PokemonResourceParameters resourceParameters)
+    {
+        var collection = context.Pokemons as IQueryable<Pokemon>;
+        if (!string.IsNullOrWhiteSpace(resourceParameters.SearchQuery))
+        {
+            var searchQuery = resourceParameters.SearchQuery.Trim();
+            collection = collection.Where(p => p.Name.Contains(searchQuery));
+        }
+        
+        var sortedList = sortHelper.ApplySort(collection, resourceParameters.OrderBy);
+        
+        return await CreateAsync(
+            sortedList,
+            resourceParameters.PageNumber,
+            resourceParameters.PageSize);
+    }
+
     public async Task<bool> ExistsAsync(int id)
     {
         return await context.Pokemons
