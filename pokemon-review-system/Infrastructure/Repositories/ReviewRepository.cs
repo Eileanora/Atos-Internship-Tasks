@@ -27,7 +27,7 @@ public class ReviewRepository(
     public async Task<PagedList<Review>> GetAllAsync(
         ReviewResourceParameters resourceParameters)
     {
-        var collection = context.Reviews.AsQueryable();
+        var collection = context.Reviews.AsQueryable().AsNoTracking();
         if (!string.IsNullOrWhiteSpace(resourceParameters.SearchQuery))
         {
             var searchQuery = resourceParameters.SearchQuery.Trim().ToLower();

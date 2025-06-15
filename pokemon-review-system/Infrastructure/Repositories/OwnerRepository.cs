@@ -27,7 +27,7 @@ public class OwnerRepository(DataContext context,
 
     public async Task<PagedList<Owner>> GetAllAsync(OwnerResourceParameters resourceParameters)
     {
-        var collection = context.Owners.AsQueryable();
+        var collection = context.Owners.AsQueryable().AsNoTracking();
         if (!string.IsNullOrWhiteSpace(resourceParameters.SearchQuery))
         {
             var searchQuery = resourceParameters.SearchQuery.Trim().ToLower();

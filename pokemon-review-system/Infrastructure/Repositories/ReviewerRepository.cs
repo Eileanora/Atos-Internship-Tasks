@@ -42,7 +42,7 @@ public class ReviewerRepository(
 
     public async Task<PagedList<Reviewer>> GetAllAsync(ReviewerResourceParameters resourceParameters)
     {
-        var collection = context.Reviewers.AsQueryable();
+        var collection = context.Reviewers.AsQueryable().AsNoTracking();
         if (!string.IsNullOrWhiteSpace(resourceParameters.SearchQuery))
         {
             var searchQuery = resourceParameters.SearchQuery.Trim().ToLower();
