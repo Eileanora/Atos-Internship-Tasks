@@ -9,13 +9,13 @@ namespace Infrastructure.Repositories;
 public class BaseRepository<TEntity>(DataContext context) : ReadOnlyBaseRepository<TEntity>(context), IBaseRepository<TEntity>
     where TEntity : BaseEntity
 {    
-    public async Task<TEntity> AddAsync(TEntity entity)
+    public virtual async Task<TEntity> AddAsync(TEntity entity)
     {
         await context.Set<TEntity>().AddAsync(entity);
         return entity;
     }
 
-    public TEntity UpdateAsync(TEntity entity)
+    public virtual TEntity UpdateAsync(TEntity entity)
     {
         context.Entry(entity).State = EntityState.Modified;
         return entity;
@@ -25,6 +25,16 @@ public class BaseRepository<TEntity>(DataContext context) : ReadOnlyBaseReposito
     public void DeleteAsync(TEntity entity)
     {
         context.Set<TEntity>().Remove(entity);
+    }
+
+    public virtual async Task<TEntity?> FindByIdAsync(int id)
+    {
+        return await context.Set<TEntity>().FindAsync(id);
+    }
+
+    public virtual async Task<TEntity?> GetByIdAsyncWithInclude(int id)
+    {
+        return await context.Set<TEntity>().FindAsync(id);
     }
 
     protected static async Task<PagedList<TEntity>> CreateAsync(

@@ -35,10 +35,18 @@ internal class PokemonRepository(
             .AnyAsync(p => p.Name.ToLower() == name.ToLower());
     }
 
-    public async Task<Pokemon?> GetByIdAsync(int id)
+    public async Task<Pokemon?> GetByIdAsync(int id, bool includeCategories = false)
     {
+        if (includeCategories)
+        {
+            return await context.Pokemons
+                .Include(p => p.PokemonCategories)
+                .ThenInclude(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
         return await context.Pokemons
-            .FindAsync(id);
+            .Include(p => p.PokemonCategories)
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<PagedList<Pokemon>> GetAllAsync(PokemonResourceParameters resourceParameters)

@@ -79,6 +79,9 @@ public class PokemonController(IPokemonManager pokemonManager,
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> AddAsync([FromBody] PokemonDto pokemonDto)
     {
+        var inputValid = await ValidationHelper.ValidateAndReportAsync(pokemonValidator, pokemonDto, "Input");
+        if (!inputValid.IsSuccess)
+            return inputValid.ToActionResult();
         var result = await pokemonManager.AddAsync(pokemonDto);
         if (!result.IsSuccess)
             return result.ToActionResult();

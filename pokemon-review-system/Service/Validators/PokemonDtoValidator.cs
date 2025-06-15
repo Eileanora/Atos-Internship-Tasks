@@ -10,8 +10,19 @@ public class PokemonDtoValidator : AbstractValidator<PokemonDto>
     public PokemonDtoValidator(
         IUnitOfWork unitOfWork)
     {
+        Func<IEnumerable<int>, CancellationToken, Task<bool>> categoriesExistRule = async (categoriesId, _) =>
+        {
+            return await unitOfWork.CategoryRepository.CheckCategoriesExistAsync(categoriesId);
+        };
         RuleSet("Input", () =>
         {
+            RuleFor(p => p.Name)
+                .NotNull();
+            RuleFor(p => p.BirthDate)
+                .NotNull();
+            RuleFor(p => p.CategoriesId)
+                .NotNull();
+            
             RuleFor(p => p.Name)
                 .NotEmpty().WithMessage(string.Format(CommonValidationErrorMessages.Required, "Name"))
                 .MaximumLength(100).WithMessage(string.Format(CommonValidationErrorMessages.StringLength, "Name", 100)); 
@@ -20,6 +31,8 @@ public class PokemonDtoValidator : AbstractValidator<PokemonDto>
                 .NotEmpty().WithMessage(string.Format(CommonValidationErrorMessages.Required, "BirthDate"))
                 .LessThanOrEqualTo(DateTime.Today).WithMessage(CommonValidationErrorMessages.BirthDateFuture);
 
+            RuleFor(p => p.CategoriesId)
+                .NotEmpty().WithMessage(string.Format(CommonValidationErrorMessages.Required, "CategoriesId"));
         });
         
         RuleSet("CreateBusiness", () =>
@@ -31,8 +44,15 @@ public class PokemonDtoValidator : AbstractValidator<PokemonDto>
                     return nameExists;
                 })
                 .WithMessage(p => string.Format(CommonValidationErrorMessages.NameExists, p.Name));
+            
+            RuleFor(p => p.CategoriesId)
+                .MustAsync(async (categoriesId, _) =>
+                {
+                    return await unitOfWork.CategoryRepository.CheckCategoriesExistAsync(categoriesId);
+                })
+                .WithMessage(p => string.Format(CommonValidationErrorMessages.InvalidId));
         });
-        // TODO: Update validation is not working properly, need to fix it
+        
         RuleSet("UpdateBusiness", () =>
         {
             RuleFor(p => p)
@@ -43,6 +63,12 @@ public class PokemonDtoValidator : AbstractValidator<PokemonDto>
                     return nameExists == null || nameExists.Id == pokemonId;
                 })
                 .WithMessage(p => string.Format(CommonValidationErrorMessages.NameExists, p.Name));
+            RuleFor(p => p.CategoriesId)
+                .MustAsync(async (categoriesId, _) =>
+                {
+                    return await unitOfWork.CategoryRepository.CheckCategoriesExistAsync(categoriesId);
+                })
+                .WithMessage(p => string.Format(CommonValidationErrorMessages.InvalidId));
         });
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace Service.Interfaces;
+﻿using Domain.Models;
 
-public class IOwnerRepository
+namespace Service.Interfaces;
+
+public interface IOwnerRepository : IBaseRepository<Owner>
 {
-    
+    Task <bool> ExistsAsync(int ownerId);
 }

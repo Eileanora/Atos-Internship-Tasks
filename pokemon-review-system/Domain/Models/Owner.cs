@@ -7,6 +7,7 @@ public class Owner : BaseEntityPrimaryKey
     public string Gym { get; set; } = string.Empty;
     public Country? Country { get; set; }
     public int CountryId { get; set; }
-    
+
+    // public ICollection<Pokemon>? Pokemons { get; set; } = new List<Pokemon>();
     public ICollection<PokemonOwner> PokemonOwners { get; set; } = new List<PokemonOwner>();
 }

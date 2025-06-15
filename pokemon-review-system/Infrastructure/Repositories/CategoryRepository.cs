@@ -18,4 +18,12 @@ public class CategoryRepository(DataContext context) : ReadOnlyBaseRepository<Ca
         return await context.Categories
             .FirstOrDefaultAsync(c => c.Id == id);
     }
+    
+    public async Task<bool> CheckCategoriesExistAsync(IEnumerable<int> categoryIds)
+    {
+        return await context.Categories
+            .AsNoTracking()
+            .Where(c => categoryIds.Contains(c.Id))
+            .CountAsync() == categoryIds.Count();
+    }
 }

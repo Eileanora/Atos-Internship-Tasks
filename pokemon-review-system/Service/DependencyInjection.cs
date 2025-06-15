@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.DTOs;
 using Service.Managers.CategoryManager;
 using Service.Managers.CountryManager;
+using Service.Managers.OwnerManager;
 using Service.Managers.PokemonManager;
 using Service.Validators;
 
@@ -15,6 +16,7 @@ public static class DependencyInjection
         services.AddScoped<IPokemonManager, PokemonManager>();
         services.AddScoped<ICountryManager, CountryManager>();
         services.AddScoped<ICategoryManager, CategoryManager>();
+        services.AddScoped<IOwnerManager, OwnerManager>();
         services.AddValidatorsFromAssemblyContaining<PokemonDtoValidator>();
 
         return services;
