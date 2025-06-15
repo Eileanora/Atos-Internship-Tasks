@@ -8,5 +8,7 @@ public interface IUnitOfWork : IDisposable
     ICountryRepository CountryRepository { get; }
     IOwnerRepository OwnerRepository { get; }
     IPokemonOwnerRepository PokemonOwnerRepository { get; }
+    IReviewRepository ReviewRepository { get; }
+    IReviewerRepository ReviewerRepository { get; }
     Task<int> SaveChangesAsync();
 }

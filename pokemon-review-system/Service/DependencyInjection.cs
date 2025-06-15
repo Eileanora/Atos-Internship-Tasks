@@ -5,6 +5,7 @@ using Service.Managers.CategoryManager;
 using Service.Managers.CountryManager;
 using Service.Managers.OwnerManager;
 using Service.Managers.PokemonManager;
+using Service.Managers.ReviewerManager;
 using Service.Validators;
 
 namespace Service;
@@ -17,6 +18,7 @@ public static class DependencyInjection
         services.AddScoped<ICountryManager, CountryManager>();
         services.AddScoped<ICategoryManager, CategoryManager>();
         services.AddScoped<IOwnerManager, OwnerManager>();
+        services.AddScoped<IReviewerManager, ReviewerManager>();
         services.AddValidatorsFromAssemblyContaining<PokemonDtoValidator>();
 
         return services;

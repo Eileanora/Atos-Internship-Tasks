@@ -10,15 +10,19 @@ public class UnitOfWork : IUnitOfWork
     public ICategoryRepository CategoryRepository { get; }
     public ICountryRepository CountryRepository { get; }
     public IOwnerRepository OwnerRepository { get; }
-public IPokemonOwnerRepository PokemonOwnerRepository { get; }
-
+    public IPokemonOwnerRepository PokemonOwnerRepository { get; }
+    public IReviewRepository ReviewRepository { get; }
+    public IReviewerRepository ReviewerRepository { get; }
+    
     public UnitOfWork(
         DataContext dbContext,
         IPokemonRepository pokemonRepository,
         ICategoryRepository categoryRepository,
         ICountryRepository countryRepository,
         IOwnerRepository ownerRepository,
-        IPokemonOwnerRepository pokemonOwnerRepository)
+        IPokemonOwnerRepository pokemonOwnerRepository,
+        IReviewRepository reviewRepository,
+        IReviewerRepository reviewerRepository)
     {
         _dbContext = dbContext;
         PokemonRepository = pokemonRepository;
@@ -26,6 +30,8 @@ public IPokemonOwnerRepository PokemonOwnerRepository { get; }
         CountryRepository = countryRepository;
         OwnerRepository = ownerRepository;
         PokemonOwnerRepository = pokemonOwnerRepository;
+        ReviewRepository = reviewRepository;
+        ReviewerRepository = reviewerRepository;
     }
 
     public async Task<int> SaveChangesAsync()
