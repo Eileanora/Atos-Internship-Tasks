@@ -1,19 +1,13 @@
-﻿using Domain.Models;
+﻿using Domain.Interfaces;
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace   Infrastructure.Interceptors;
 // TODO: Come back and make a specific setter for each entity type
-public sealed class UpdateAuditFieldsInterceptor : SaveChangesInterceptor
+public sealed class UpdateAuditFieldsInterceptor(IUserContext userContext) : SaveChangesInterceptor
 {
-    // Attempt to use a dictionary to map entity types to their specific audit field setters (FAILED)
-    // private readonly Dictionary<Type, Action<EntityEntry<BaseEntity>>> _entityAuditSetters = new()
-    // {
-    //     { typeof(Pokemon), entry => SetPokemonUnmodifiedPropertiesStatic((Pokemon)entry) },
-    //     // Add more mappings here for other entity types as needed
-    // };
-
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
@@ -32,10 +26,12 @@ public sealed class UpdateAuditFieldsInterceptor : SaveChangesInterceptor
             .ChangeTracker
             .Entries<BaseEntity>();
         
+        var isLoggedIn = userContext.IsAuthenticated;
+        Guid? currentUserId = isLoggedIn ? userContext.UserId : null;
         
         foreach (var entityEntry in entries)
         {
-            SetEntitiesAuditFields(entityEntry);
+            SetAuditFields(entityEntry, currentUserId);
         }
         return base.SavingChangesAsync(
             eventData,
@@ -43,36 +39,24 @@ public sealed class UpdateAuditFieldsInterceptor : SaveChangesInterceptor
             cancellationToken);
     }
 
-    void SetEntitiesAuditFields(EntityEntry<BaseEntity> entityEntry)
+    void SetAuditFields(EntityEntry<BaseEntity> entityEntry,Guid? currentUserId)
     {
-        // if (_entityAuditSetters.TryGetValue(entityEntry.Entity.GetType(), out var setter))
-        // {
-        //     setter(entityEntry);
-        // }
-
         if (entityEntry.State == EntityState.Added)
         {
             entityEntry.Property(e => e.CreatedDate).CurrentValue = DateTime.Now;
             entityEntry.Property(e => e.ModifiedDate).CurrentValue = DateTime.Now;
+            if (currentUserId != Guid.Empty)
+            {
+                entityEntry.Property(e => e.CreatedBy).CurrentValue = currentUserId;
+                entityEntry.Property(e => e.ModifiedBy).CurrentValue = currentUserId;
+            }
         }
         if (entityEntry.State == EntityState.Modified)
         {
             entityEntry.Property(e => e.ModifiedDate).CurrentValue = DateTime.Now;
             entityEntry.Property(e => e.CreatedDate).IsModified = false;
+            entityEntry.Property(e => e.CreatedBy).IsModified = false;
+            entityEntry.Property(e => e.ModifiedBy).CurrentValue = currentUserId;
         }
     }
-
-    // Static version for dictionary delegate
-    // private static void SetPokemonUnmodifiedPropertiesStatic(EntityEntry<Pokemon> entry)
-    // {
-    //     var pokemonEntry = entry.Cast<Pokemon>();
-    //     pokemonEntry.Property(e => e.CreatedDate).IsModified = false;
-    //     pokemonEntry.Property(e => e.Name).IsModified = false;
-    // }
-    // private static void SetPokemonUnmodifiedPropertiesStatic(EntityEntry<Pokemon> entityEntry)
-    // {
-    //     // Example: Prevent modification of CreatedDate for Pokemon
-    //     entityEntry.Property(e => e.CreatedDate).IsModified = false;
-    //     entityEntry.Property(e => e.Name).IsModified = false;
-    // }
 }

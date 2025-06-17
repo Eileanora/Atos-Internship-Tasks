@@ -8,16 +8,23 @@ using Infrastructure.Helpers;
 namespace Infrastructure.Repositories;
 
 public class OwnerRepository(DataContext context,
-    ISortHelper<Owner> sortHelper)
+    ISortHelper<Owner> sortHelper,
+    IUserContext contextUser)
     : BaseRepository<Owner>(context), IOwnerRepository
 {
     // override get by id
     public async Task<Owner?> GetByIdAsyncWithInclude(int id)
     {
-        return await context.Owners
-            .Include(o => o.Country)
-            .Include(o => o.PokemonOwners)
-            .FirstOrDefaultAsync(o => o.Id == id);
+        var result = context.Owners.AsQueryable();
+        result = result.Include(o => o.Country)
+            .Include(o => o.PokemonOwners);
+
+        Owner? owner;
+        if (!contextUser.IsAdmin)
+            owner = await result.FirstOrDefaultAsync(x => x.Id == id && x.UserId == contextUser.UserId.ToString());
+        else
+            owner = await result.FirstOrDefaultAsync(x => x.Id == id);
+        return owner;
     }
     
     public async Task<bool> ExistsAsync(int ownerId)

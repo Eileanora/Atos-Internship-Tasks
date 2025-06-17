@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Service.Services;
 
 namespace Infrastructure;
 
@@ -40,6 +41,7 @@ public static class DependencyInjection
         services.AddScoped<ISortHelper<Owner>, SortHelper<Owner>>();
         services.AddScoped<ISortHelper<Reviewer>, SortHelper<Reviewer>>();
         services.AddScoped<ISortHelper<Review>, SortHelper<Review>>();
+        services.AddSingleton<IUserContext, UserContext>();
         services.AddIdentity<User, IdentityRole>(options =>
         {
             // Password settings
