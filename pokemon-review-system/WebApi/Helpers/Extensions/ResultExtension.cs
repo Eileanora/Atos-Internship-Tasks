@@ -29,6 +29,9 @@ public static class ResultExtension
             nameof(ErrorMessages.InvalidInput) or "InvalidInput" => new BadRequestObjectResult(error),
             nameof(ErrorMessages.ValidationError) or "ValidationError" => new BadRequestObjectResult(error),
             nameof(ErrorMessages.InternalServerError) or "InternalServerError" => new ObjectResult(error) { StatusCode = 500 },
+            nameof(ErrorMessages.WrongCredentials) or "WrongCredentials" => new UnauthorizedObjectResult(error),
+            nameof(ErrorMessages.CannotGenerateToken) or "CannotGenerateToken" => new ObjectResult(error) { StatusCode = 500 },
+            nameof(ErrorMessages.InvalidRefreshToken) or "InvalidRefreshToken" => new UnauthorizedObjectResult(error),
             _ => new ObjectResult(error) { StatusCode = 500 }
         };
     }

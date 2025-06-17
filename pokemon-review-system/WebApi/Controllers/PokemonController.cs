@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTOs;
@@ -6,6 +7,7 @@ using Service.Managers.PokemonManager;
 using Service.Mappers;
 using Shared.Helpers;
 using Shared.ResourceParameters;
+using WebApi.Helpers;
 using WebApi.Helpers.Extensions;
 using WebApi.Helpers.PaginationHelper;
 using WebApi.Helpers.Validation;
@@ -19,7 +21,6 @@ public class PokemonController(IPokemonManager pokemonManager,
     IPaginationHelper<PokemonDto, PokemonResourceParameters> paginationHelper) : ControllerBase
 {
     // GET ALL ASYNC
-    // TODO: add pagination and filtering (use paged list DTO)
     [HttpGet(Name = "GetAllPokemons")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllAsync(
@@ -35,6 +36,7 @@ public class PokemonController(IPokemonManager pokemonManager,
     
     // GET BY ID ASYNC
     [HttpGet("{id}", Name = "GetPokemonById")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = IdentityData.AdminUserPolicyName)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByIdAsync(int id)
@@ -55,6 +57,7 @@ public class PokemonController(IPokemonManager pokemonManager,
     
     // PATCH ASYNC
     [HttpPatch("{id}", Name = "UpdatePokemon")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = IdentityData.AdminUserPolicyName)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -83,6 +86,7 @@ public class PokemonController(IPokemonManager pokemonManager,
 
     // POST ASYNC
     [HttpPost(Name = "AddPokemon")]
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -99,6 +103,7 @@ public class PokemonController(IPokemonManager pokemonManager,
     
     // DELETE ASYNC
     [HttpDelete("{id}", Name = "DeletePokemon")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = IdentityData.AdminUserPolicyName)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

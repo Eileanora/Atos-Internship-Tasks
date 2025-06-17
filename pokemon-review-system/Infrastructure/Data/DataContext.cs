@@ -20,4 +20,5 @@ public class DataContext(DbContextOptions<DataContext> options) : IdentityDbCont
     public DbSet<PokemonCategory> PokemonCategories { get; set; }
     public DbSet<Country> Countries { get; set; }
     public DbSet<PokemonOwner> PokemonOwners { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 }

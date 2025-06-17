@@ -13,9 +13,17 @@ builder.Services.AddControllers(options =>
 });
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddServiceLayer();
-builder.Services.AddApiLayer();
+builder.Services.AddApiLayer(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(IdentityData.AdminUserPolicyName, p =>
+    {
+        p.RequireClaim("Role", "Admin");
+    });
+    options.AddPolicy(IdentityData.OwnerUserPolicyName, policy => policy.RequireRole("User"));
+});
 
 // services end here
 var app = builder.Build();
@@ -40,6 +48,8 @@ void SeedData(IHost app)
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseSwagger();
 app.MapControllers();
 app.UseExceptionHandler();

@@ -35,12 +35,29 @@ public static class DependencyInjection
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped<IReviewerRepository, ReviewerRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ISortHelper<Pokemon>, SortHelper<Pokemon>>();
         services.AddScoped<ISortHelper<Owner>, SortHelper<Owner>>();
         services.AddScoped<ISortHelper<Reviewer>, SortHelper<Reviewer>>();
         services.AddScoped<ISortHelper<Review>, SortHelper<Review>>();
-        services.AddIdentity<User, IdentityRole>()
-            .AddEntityFrameworkStores<DataContext>();
+        services.AddIdentity<User, IdentityRole>(options =>
+        {
+            // Password settings
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequiredLength = 8;
+
+            // Lockout settings
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+            options.Lockout.MaxFailedAccessAttempts = 5;
+
+            // User settings
+            options.User.RequireUniqueEmail = true; 
+        }).AddEntityFrameworkStores<DataContext>()
+        .AddDefaultTokenProviders();
+
 
         // services.AddScoped<>();
         return services;

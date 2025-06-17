@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Service.Interfaces;
 using Service.Managers.AuthManager;
 using Shared.DTOs;
 using Service.Managers.CategoryManager;
@@ -8,6 +9,8 @@ using Service.Managers.OwnerManager;
 using Service.Managers.PokemonManager;
 using Service.Managers.ReviewerManager;
 using Service.Managers.ReviewManager;
+using Service.Services;
+using Service.Services.GenerateTokenService;
 using Service.Validators;
 
 namespace Service;
@@ -23,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<IReviewerManager, ReviewerManager>();
         services.AddScoped<IReviewManager, ReviewManager>();
         services.AddScoped<IAuthManager, AuthManager>();
+        services.AddScoped<IGenerateTokenService, GenerateTokenService>();
         services.AddValidatorsFromAssemblyContaining<PokemonDtoValidator>();
 
         return services;

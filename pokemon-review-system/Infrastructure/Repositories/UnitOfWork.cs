@@ -14,6 +14,8 @@ public class UnitOfWork : IUnitOfWork
     public IReviewRepository ReviewRepository { get; }
     public IReviewerRepository ReviewerRepository { get; }
     
+    public IRefreshTokenRepository RefreshTokenRepository { get; }
+    
     public UnitOfWork(
         DataContext dbContext,
         IPokemonRepository pokemonRepository,
@@ -22,7 +24,8 @@ public class UnitOfWork : IUnitOfWork
         IOwnerRepository ownerRepository,
         IPokemonOwnerRepository pokemonOwnerRepository,
         IReviewRepository reviewRepository,
-        IReviewerRepository reviewerRepository)
+        IReviewerRepository reviewerRepository,
+        IRefreshTokenRepository refreshTokenRepository)
     {
         _dbContext = dbContext;
         PokemonRepository = pokemonRepository;
@@ -32,6 +35,7 @@ public class UnitOfWork : IUnitOfWork
         PokemonOwnerRepository = pokemonOwnerRepository;
         ReviewRepository = reviewRepository;
         ReviewerRepository = reviewerRepository;
+        RefreshTokenRepository = refreshTokenRepository;
     }
 
     public async Task<int> SaveChangesAsync()

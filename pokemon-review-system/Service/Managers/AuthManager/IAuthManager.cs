@@ -7,7 +7,9 @@ namespace Service.Managers.AuthManager;
 public interface IAuthManager
 {
     Task<Result<User>> RegisterAsync(RegisterDto registerDto);
-    Task<Result?> LoginAsync(LoginDto userDto);
-    Task<Result?> RefreshTokenAsync(string accessToken, string refreshToken);
-    public Task<bool> LogoutAsync(string refreshToken);
+    Task<Result<AuthTokensResponse>> LoginAsync(LoginDto userDto);
+    Task<Result<AuthTokensResponse>> RefreshTokenAsync(string accessToken, string refreshToken);
+    public Task<Result> LogoutAsync(string refreshToken);
+    
+    Task<Result> AddToRoleAsync(string role, User? user, string? email);
 }

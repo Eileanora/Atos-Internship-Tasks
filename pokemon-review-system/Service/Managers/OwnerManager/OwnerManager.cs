@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Internal;
+using Microsoft.VisualBasic;
 using Service.Common.Constants;
 using Shared.DTOs;
 using Service.Interfaces;
@@ -50,6 +51,9 @@ public class OwnerManager(
         var result = await unitOfWork.SaveChangesAsync();
         if (result <= 0)
             return Result<int>.Failure(ErrorMessages.InternalServerError);
+        
+        await authManager.AddToRoleAsync("Owner", createUserResult.Value, null);
+        
         return Result<int>.Success(newOwner.Id);
     }
 
