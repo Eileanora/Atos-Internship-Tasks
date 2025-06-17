@@ -1,13 +1,18 @@
-﻿using FluentValidation;
+﻿using Domain.Models;
+using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Service.Common.Constants;
 using Service.Interfaces;
 using Shared.DTOs;
 
 namespace Service.Validators;
 
-public class OwnerDtoValidator : AbstractValidator<OwnerDto>
+public class CreateOwnerValidator : RegisterDtoValidator<CreateOwnerDto>
 {
-    public OwnerDtoValidator(IUnitOfWork unitOfWork)
+    public CreateOwnerValidator(
+        IUnitOfWork unitOfWork,
+        UserManager<User> userManager) : base(userManager)
+    // TODO: Find a way to inject OwnerDtoValidator input ruleset here
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
         ClassLevelCascadeMode = CascadeMode.Stop;
@@ -31,8 +36,8 @@ public class OwnerDtoValidator : AbstractValidator<OwnerDto>
                 .NotNull().WithMessage(string.Format(CommonValidationErrorMessages.Required, nameof(OwnerDto.CountryId)))
                 .GreaterThan(0).WithMessage(string.Format(CommonValidationErrorMessages.InvalidId));
         });
-        
-        RuleSet("UpdateBusiness", () =>
+
+        RuleSet("CreateBusiness", () =>
         {
             // check country exists
             RuleFor(x => x.CountryId)

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Shared.DTOs;
 using Service.Managers.PokemonManager;
 using Service.Mappers;
+using Shared.Helpers;
 using Shared.ResourceParameters;
 using WebApi.Helpers.Extensions;
 using WebApi.Helpers.PaginationHelper;

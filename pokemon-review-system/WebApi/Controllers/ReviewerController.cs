@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Managers.ReviewerManager;
 using Shared.DTOs;
+using Shared.Helpers;
 using Shared.ResourceParameters;
 using WebApi.Helpers.Extensions;
 using WebApi.Helpers.PaginationHelper;

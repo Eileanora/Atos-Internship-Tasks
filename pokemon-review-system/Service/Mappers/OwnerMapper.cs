@@ -60,15 +60,14 @@ public static class OwnerMapper
         };
     }
     
-    public static Owner ToEntity(this OwnerDto ownerDto)
+    public static Owner ToEntity(this CreateOwnerDto ownerDto)
     {
         return new Owner
         {
-            Id = ownerDto.Id ?? 0,
             FirstName = ownerDto.FirstName ?? string.Empty,
             LastName = ownerDto.LastName ?? string.Empty,
             Gym = ownerDto.Gym ?? string.Empty,
-            CountryId = ownerDto.CountryId ?? 0
+            CountryId = (int)ownerDto.CountryId
         };
     }
     

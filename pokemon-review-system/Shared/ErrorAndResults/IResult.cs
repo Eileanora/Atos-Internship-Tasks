@@ -1,4 +1,4 @@
-namespace Service.Common.ErrorAndResults;
+namespace Shared.ErrorAndResults;
 
 public interface IResult
 {

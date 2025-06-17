@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.Common.Constants;
-using Service.Common.ErrorAndResults;
+using Shared.ErrorAndResults;
 
 namespace WebApi.Helpers.Extensions;
 

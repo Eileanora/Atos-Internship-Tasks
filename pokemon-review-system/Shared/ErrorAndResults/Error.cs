@@ -1,4 +1,4 @@
-﻿namespace Service.Common.ErrorAndResults;
+﻿namespace Shared.ErrorAndResults;
 
 public sealed record Error(string Code, string Description)
 {

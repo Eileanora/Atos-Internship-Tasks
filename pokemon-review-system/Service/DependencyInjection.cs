@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Service.Managers.AuthManager;
 using Shared.DTOs;
 using Service.Managers.CategoryManager;
 using Service.Managers.CountryManager;
@@ -21,6 +22,7 @@ public static class DependencyInjection
         services.AddScoped<IOwnerManager, OwnerManager>();
         services.AddScoped<IReviewerManager, ReviewerManager>();
         services.AddScoped<IReviewManager, ReviewManager>();
+        services.AddScoped<IAuthManager, AuthManager>();
         services.AddValidatorsFromAssemblyContaining<PokemonDtoValidator>();
 
         return services;

@@ -3,10 +3,10 @@ using Infrastructure.Data;
 using Infrastructure.Helpers;
 using Infrastructure.Interceptors;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Service.Interfaces;
 
 namespace Infrastructure;
@@ -39,6 +39,8 @@ public static class DependencyInjection
         services.AddScoped<ISortHelper<Owner>, SortHelper<Owner>>();
         services.AddScoped<ISortHelper<Reviewer>, SortHelper<Reviewer>>();
         services.AddScoped<ISortHelper<Review>, SortHelper<Review>>();
+        services.AddIdentity<User, IdentityRole>()
+            .AddEntityFrameworkStores<DataContext>();
 
         // services.AddScoped<>();
         return services;

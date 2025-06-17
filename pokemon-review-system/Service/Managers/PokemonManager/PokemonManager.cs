@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.Internal;
 using Service.Common.Constants;
-using Service.Common.ErrorAndResults;
+using Shared.ErrorAndResults;
 using Shared.DTOs;
 using Service.Interfaces;
 using Service.Mappers;

@@ -10,4 +10,7 @@ public class Owner : BaseEntityPrimaryKey
 
     // public ICollection<Pokemon>? Pokemons { get; set; } = new List<Pokemon>();
     public ICollection<PokemonOwner> PokemonOwners { get; set; } = new List<PokemonOwner>();
+    
+    public string UserId { get; set; } = string.Empty;
+    public virtual User User { get; set; }
 }

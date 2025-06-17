@@ -1,18 +1,23 @@
 ﻿using FluentValidation;
 using FluentValidation.Internal;
 using Service.Common.Constants;
-using Service.Common.ErrorAndResults;
 using Shared.DTOs;
 using Service.Interfaces;
+using Service.Managers.AuthManager;
 using Service.Mappers;
+using Shared.ErrorAndResults;
 using Shared.ResourceParameters;
+using Shared.Helpers;
+
 
 namespace Service.Managers.OwnerManager;
 
 public class OwnerManager(
     IUnitOfWork unitOfWork,
     IValidator<OwnerDto> ownerValidator,
-    IValidator<Domain.Models.PokemonOwner> pokemonOwnerValidator) 
+    IValidator<CreateOwnerDto> createOwnerValidator,
+    IValidator<Domain.Models.PokemonOwner> pokemonOwnerValidator,
+    IAuthManager authManager) 
     : IOwnerManager
 {
     public async Task<Result<PagedList<OwnerDto>>> GetAllAsync(OwnerResourceParameters resourceParameters)
@@ -29,23 +34,23 @@ public class OwnerManager(
         return Result<OwnerDto>.Success(owner.ToDetailDto());
     }
 
-    public async Task<Result<OwnerDto>> AddAsync(OwnerDto owner)
+    public async Task<Result<int>> AddAsync(CreateOwnerDto owner)
     {
-        var validationResult = await ownerValidator.ValidateAsync(owner,
-            options => options.IncludeRuleSets("Business"));
-        
-        if (!validationResult.IsValid)
-        {
-            var errorMessage = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-            return Result<OwnerDto>.Failure(new Error("ValidationError", errorMessage));
-        }
+        var validationResult = await ValidationHelper.ValidateAndReportAsync(createOwnerValidator, owner, "CreateBusiness");
+        if(!validationResult.IsSuccess)
+            return Result<int>.Failure(validationResult.Error);
+
+        var createUserResult = await authManager.RegisterAsync(owner.OwnerToRegisterDto());
+        if (!createUserResult.IsSuccess)
+            return Result<int>.Failure(createUserResult.Error);
         
         var newOwner = owner.ToEntity();
+        newOwner.UserId = createUserResult.Value.Id;
         await unitOfWork.OwnerRepository.AddAsync(newOwner);
         var result = await unitOfWork.SaveChangesAsync();
         if (result <= 0)
-            return Result<OwnerDto>.Failure(ErrorMessages.InternalServerError);
-        return Result<OwnerDto>.Success(newOwner.ToCreatedDto());
+            return Result<int>.Failure(ErrorMessages.InternalServerError);
+        return Result<int>.Success(newOwner.Id);
     }
 
     public async Task<Result<OwnerDto>> UpdateAsync(OwnerDto owner)

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Managers.OwnerManager;
 using Shared.DTOs;
+using Shared.Helpers;
 using Shared.ResourceParameters;
 using WebApi.Helpers.Extensions;
 using WebApi.Helpers.PaginationHelper;
@@ -14,6 +15,7 @@ namespace WebApi.Controllers;
 [ApiController]
 public class OwnerController(IOwnerManager ownerManager,
     IValidator<OwnerDto> ownerValidator,
+    IValidator<CreateOwnerDto> createOwnerValidator,
     IPaginationHelper<OwnerDto, OwnerResourceParameters> paginationHelper) : ControllerBase
 {
     // GET ALL ASYNC
@@ -43,15 +45,15 @@ public class OwnerController(IOwnerManager ownerManager,
     [HttpPost(Name = "AddOwner")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> AddAsync([FromBody] OwnerDto ownerDto)
+    public async Task<IActionResult> AddAsync([FromBody] CreateOwnerDto ownerDto)
     {
-        var inputValid = await ValidationHelper.ValidateAndReportAsync(ownerValidator, ownerDto, "Input");
+        var inputValid = await ValidationHelper.ValidateAndReportAsync(createOwnerValidator, ownerDto, "Input");
         if (!inputValid.IsSuccess)
             return inputValid.ToActionResult();
         var result = await ownerManager.AddAsync(ownerDto);
         if (!result.IsSuccess)
             return result.ToActionResult();
-        return CreatedAtRoute("GetOwnerById", new { id = result.Value.Id }, result.Value);
+        return Created();
     }
     
     // PATCH ASYNC

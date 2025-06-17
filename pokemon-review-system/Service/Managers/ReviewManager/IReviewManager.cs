@@ -1,4 +1,4 @@
-﻿using Service.Common.ErrorAndResults;
+﻿using Shared.ErrorAndResults;
 using Shared.DTOs;
 using Shared.ResourceParameters;
 

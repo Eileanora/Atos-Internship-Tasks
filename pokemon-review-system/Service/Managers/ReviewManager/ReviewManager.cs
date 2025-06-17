@@ -2,7 +2,7 @@
 using Service.Common.Constants;
 using Service.Interfaces;
 using Service.Mappers;
-using Service.Common.ErrorAndResults;
+using Shared.ErrorAndResults;
 using Shared.DTOs;
 using Shared.ResourceParameters;
 
