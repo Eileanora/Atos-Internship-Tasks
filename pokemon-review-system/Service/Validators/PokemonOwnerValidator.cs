@@ -1,7 +1,7 @@
-﻿using Domain.Models;
+﻿using Domain.Interfaces;
+using Domain.Models;
 using FluentValidation;
 using Service.Common.Constants;
-using Service.Interfaces;
 
 namespace Service.Validators;
 

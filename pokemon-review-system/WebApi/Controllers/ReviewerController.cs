@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Service.Managers.ReviewerManager;
+using Service.Interfaces;
 using Shared.DTOs;
 using Shared.Helpers;
 using Shared.ResourceParameters;

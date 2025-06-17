@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using Domain.Interfaces;
+using Domain.Models;
 using Infrastructure.Data;
 using Infrastructure.Helpers;
 using Infrastructure.Interceptors;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Service.Interfaces;
 
 namespace Infrastructure;
 

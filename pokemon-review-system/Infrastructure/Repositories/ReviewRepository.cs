@@ -1,6 +1,6 @@
-﻿using Infrastructure.Data;
+﻿using Domain.Interfaces;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Service.Interfaces;
 using Shared.ResourceParameters;
 using Infrastructure.Helpers;
 

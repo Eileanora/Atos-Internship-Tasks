@@ -1,8 +1,8 @@
-﻿using Domain.Models;
+﻿using Domain.Interfaces;
+using Domain.Models;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Service.Common.Constants;
-using Service.Interfaces;
 using Shared.DTOs;
 
 namespace Service.Validators;

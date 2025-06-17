@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Service.Managers.ReviewManager;
+using Service.Interfaces;
 using Shared.DTOs;
 using Shared.Helpers;
 using Shared.ResourceParameters;

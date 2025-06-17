@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Service.Managers.OwnerManager;
+using Service.Interfaces;
 using Shared.DTOs;
 using Shared.Helpers;
 using Shared.ResourceParameters;

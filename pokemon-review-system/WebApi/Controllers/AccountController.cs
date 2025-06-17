@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using Service.Managers.AuthManager;
+using Service.Interfaces;
 using Shared.DTOs;
 using WebApi.Helpers.Extensions;
 

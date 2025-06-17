@@ -1,6 +1,6 @@
-﻿using FluentValidation;
+﻿using Domain.Interfaces;
+using FluentValidation;
 using Service.Common.Constants;
-using Service.Interfaces;
 using Shared.DTOs;
 
 namespace Service.Validators;

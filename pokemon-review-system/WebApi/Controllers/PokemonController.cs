@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Service.Interfaces;
 using Shared.DTOs;
-using Service.Managers.PokemonManager;
 using Service.Mappers;
 using Shared.Helpers;
 using Shared.ResourceParameters;

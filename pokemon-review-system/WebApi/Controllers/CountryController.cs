@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Service.Managers.CountryManager;
+using Service.Interfaces;
 
 namespace WebApi.Controllers;
 
