@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Infrastructure;
 using Infrastructure.Data;
 using Service;
@@ -20,7 +21,7 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(IdentityData.AdminUserPolicyName, p =>
     {
-        p.RequireClaim("Role", "Admin");
+        p.RequireClaim(ClaimTypes.Role, "Admin");
     });
     options.AddPolicy(IdentityData.OwnerUserPolicyName, policy => policy.RequireRole("User"));
 });

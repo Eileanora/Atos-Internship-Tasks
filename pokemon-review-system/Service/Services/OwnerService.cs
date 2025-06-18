@@ -16,7 +16,8 @@ public class OwnerService(
     IValidator<OwnerDto> ownerValidator,
     IValidator<CreateOwnerDto> createOwnerValidator,
     IValidator<Domain.Models.PokemonOwner> pokemonOwnerValidator,
-    IAuthManager authManager) 
+    IAuthManager authManager,
+    IUserContext userContext)
     : IOwnerManager
 {
     public async Task<Result<PagedList<OwnerDto>>> GetAllAsync(OwnerResourceParameters resourceParameters)
@@ -124,6 +125,18 @@ public class OwnerService(
         var result = await unitOfWork.SaveChangesAsync();
         if (result <= 0)
             return Result.Failure(ErrorMessages.InternalServerError);
+        return Result.Success();
+    }
+    
+    public async Task<Result> ValidateOwnerAuthentication(int ownerId)
+    {
+        if (userContext.IsAdmin)
+            return Result.Success();
+
+        var isValid = await unitOfWork.OwnerRepository.OwnerIdIsUserIdAsync(ownerId, userContext.UserId.ToString());
+        
+        if (!isValid)
+            return Result.Failure(ErrorMessages.Unauthorized);
         return Result.Success();
     }
 }

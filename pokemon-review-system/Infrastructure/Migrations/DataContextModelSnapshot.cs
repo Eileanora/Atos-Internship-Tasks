@@ -49,7 +49,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.Country", b =>
@@ -79,7 +79,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Countries");
+                    b.ToTable("Countries", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.Owner", b =>
@@ -130,7 +130,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Owners");
+                    b.ToTable("Owners", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.Pokemon", b =>
@@ -163,7 +163,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Pokemons");
+                    b.ToTable("Pokemons", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.PokemonCategory", b =>
@@ -190,7 +190,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("PokemonCategories");
+                    b.ToTable("PokemonCategories", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.PokemonOwner", b =>
@@ -217,7 +217,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("PokemonOwners");
+                    b.ToTable("PokemonOwners", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.RefreshToken", b =>
@@ -259,7 +259,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.Review", b =>
@@ -306,7 +306,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ReviewerId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.Reviewer", b =>
@@ -341,7 +341,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Reviewers");
+                    b.ToTable("Reviewers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.User", b =>

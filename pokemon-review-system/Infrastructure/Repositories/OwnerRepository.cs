@@ -8,33 +8,27 @@ using Infrastructure.Helpers;
 namespace Infrastructure.Repositories;
 
 public class OwnerRepository(DataContext context,
-    ISortHelper<Owner> sortHelper,
-    IUserContext contextUser)
+    ISortHelper<Owner> sortHelper)
     : BaseRepository<Owner>(context), IOwnerRepository
 {
-    // override get by id
     public async Task<Owner?> GetByIdAsyncWithInclude(int id)
     {
-        var result = context.Owners.AsQueryable();
-        result = result.Include(o => o.Country)
-            .Include(o => o.PokemonOwners);
-
-        Owner? owner;
-        if (!contextUser.IsAdmin)
-            owner = await result.FirstOrDefaultAsync(x => x.Id == id && x.UserId == contextUser.UserId.ToString());
-        else
-            owner = await result.FirstOrDefaultAsync(x => x.Id == id);
-        return owner;
+        return await context.Owners
+            .Include(o => o.Country)
+            .Include(o => o.PokemonOwners)
+            .FirstOrDefaultAsync(o => o.Id == id);
     }
     
     public async Task<bool> ExistsAsync(int ownerId)
     {
-        return await context.Owners.AnyAsync(o => o.Id == ownerId);
+        return await context.Owners
+            .IgnoreQueryFilters()
+            .AnyAsync(o => o.Id == ownerId);
     }
 
     public async Task<PagedList<Owner>> GetAllAsync(OwnerResourceParameters resourceParameters)
     {
-        var collection = context.Owners.AsQueryable().AsNoTracking();
+        var collection = context.Owners.AsQueryable().AsNoTracking().IgnoreQueryFilters();
         if (!string.IsNullOrWhiteSpace(resourceParameters.SearchQuery))
         {
             var searchQuery = resourceParameters.SearchQuery.Trim().ToLower();
@@ -69,5 +63,12 @@ public class OwnerRepository(DataContext context,
             sortedList,
             resourceParameters.PageNumber,
             resourceParameters.PageSize);
+    }
+    
+    public async Task<bool> OwnerIdIsUserIdAsync(int ownerId, string userId)
+    {
+        return await context.Owners
+            .IgnoreQueryFilters()
+            .AnyAsync(o => o.Id == ownerId && o.UserId == userId);
     }
 }

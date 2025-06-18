@@ -10,6 +10,7 @@ public class PokemonOwnerRepository(DataContext context) : BaseRepository<Pokemo
     public async Task<bool> OwnerPokemonExistsAsync(int ownerId, int pokemonId)
     {
         return await context.PokemonOwners
+            .IgnoreQueryFilters()
             .AnyAsync(po => po.OwnerId == ownerId && po.PokemonId == pokemonId);
     }
 }

@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Security.Claims;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +7,8 @@ using Service.Interfaces;
 using Shared.DTOs;
 using Shared.Helpers;
 using Shared.ResourceParameters;
+using WebApi.Filters;
+using WebApi.Helpers;
 using WebApi.Helpers.Extensions;
 using WebApi.Helpers.PaginationHelper;
 using WebApi.Helpers.Validation;
@@ -21,7 +24,7 @@ public class OwnerController(IOwnerManager ownerManager,
 {
     // GET ALL ASYNC
     [HttpGet(Name = "GetAllOwners")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = IdentityData.AdminUserPolicyName)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllAsync(
         [FromQuery] OwnerResourceParameters resourceParameters)
@@ -36,6 +39,7 @@ public class OwnerController(IOwnerManager ownerManager,
     // GET BY ID ASYNC
     [HttpGet("{id}", Name = "GetOwnerById")]
     [Authorize(AuthenticationSchemes = "Bearer")]
+    // [ServiceFilter(typeof(AuthOwnerByIdFilter))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByIdAsync(int id)
@@ -62,6 +66,7 @@ public class OwnerController(IOwnerManager ownerManager,
     // PATCH ASYNC
     [HttpPatch("{id}", Name = "UpdateOwner")]
     [Authorize(AuthenticationSchemes = "Bearer")]
+    // [ServiceFilter(typeof(AuthOwnerByIdFilter))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -91,6 +96,7 @@ public class OwnerController(IOwnerManager ownerManager,
     // DELETE ASYNC
     [HttpDelete("{id}", Name = "DeleteOwner")]
     [Authorize(AuthenticationSchemes = "Bearer")]
+    // [ServiceFilter(typeof(AuthOwnerByIdFilter))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAsync(int id)
@@ -107,10 +113,14 @@ public class OwnerController(IOwnerManager ownerManager,
     // ADD POKEMON TO OWNER
     [HttpPost("{ownerId}/pokemons/{pokemonId}", Name = "AddPokemonToOwner")]
     [Authorize(AuthenticationSchemes = "Bearer")]
+    // [ServiceFilter(typeof(AuthOwnerByIdFilter))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddPokemonToOwnerAsync(int ownerId, int pokemonId)
     {
+        var authenticationResult = await ownerManager.ValidateOwnerAuthentication(ownerId);
+        if (!authenticationResult.IsSuccess)
+            return authenticationResult.ToActionResult();
         var result = await ownerManager.AddPokemonToOwnerAsync(ownerId, pokemonId);
         if (!result.IsSuccess)
             return result.ToActionResult();
@@ -120,10 +130,14 @@ public class OwnerController(IOwnerManager ownerManager,
     // REMOVE POKEMON FROM OWNER
     [HttpDelete("{ownerId}/pokemons/{pokemonId}", Name = "RemovePokemonFromOwner")]
     [Authorize(AuthenticationSchemes = "Bearer")]
+    // [ServiceFilter(typeof(AuthOwnerByIdFilter))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RemovePokemonFromOwnerAsync(int ownerId, int pokemonId)
     {
+        var authenticationResult = await ownerManager.ValidateOwnerAuthentication(ownerId);
+        if (!authenticationResult.IsSuccess)
+            return authenticationResult.ToActionResult();
         var result = await ownerManager.RemovePokemonFromOwnerAsync(ownerId, pokemonId);
         if (!result.IsSuccess)
             return result.ToActionResult();

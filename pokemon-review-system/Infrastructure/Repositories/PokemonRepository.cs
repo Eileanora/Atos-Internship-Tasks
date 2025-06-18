@@ -51,7 +51,7 @@ internal class PokemonRepository(
 
     public async Task<PagedList<Pokemon>> GetAllAsync(PokemonResourceParameters resourceParameters)
     {
-        var collection = context.Pokemons.AsQueryable().AsNoTracking();
+        var collection = context.Pokemons.AsQueryable().AsNoTracking().IgnoreQueryFilters();
         if (!string.IsNullOrWhiteSpace(resourceParameters.SearchQuery))
         {
             var searchQuery = resourceParameters.SearchQuery.Trim().ToLower();

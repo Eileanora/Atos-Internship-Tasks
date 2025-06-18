@@ -13,4 +13,5 @@ public interface IOwnerManager
     Task<Result> DeleteAsync(OwnerDto owner);
     Task<Result> AddPokemonToOwnerAsync(int ownerId, int pokemonId);
     Task<Result> RemovePokemonFromOwnerAsync(int ownerId, int pokemonId);
+    Task<Result> ValidateOwnerAuthentication(int ownerId);
 }
