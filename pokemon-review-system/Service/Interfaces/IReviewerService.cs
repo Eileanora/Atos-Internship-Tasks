@@ -1,10 +1,10 @@
-﻿using Shared.DTOs;
+﻿using Service.DTOs;
 using Shared.ErrorAndResults;
 using Shared.ResourceParameters;
 
 namespace Service.Interfaces;
 
-public interface IReviewerManager
+public interface IReviewerService
 {
     Task<Result<PagedList<ReviewerDto>>> GetAllAsync(ReviewerResourceParameters resourceParameters);
     Task<Result<ReviewerDto>> GetByIdAsync(int id);

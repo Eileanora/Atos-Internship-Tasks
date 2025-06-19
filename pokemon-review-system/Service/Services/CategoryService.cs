@@ -1,12 +1,12 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
+using Service.DTOs;
 using Service.Interfaces;
 using Service.Mappers;
-using Shared.DTOs;
 
 namespace Service.Services;
 
-public class CategoryService(IUnitOfWork unitOfWork) : ICategoryManager
+public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
 {
     public async Task<IEnumerable<CategoryDto>> GetAllAsync()
     {

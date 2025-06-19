@@ -1,10 +1,12 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Shared.DTOs;
+namespace Service.DTOs;
 
 public class OwnerDto : BaseDto
 {
-    public int? Id { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
+    public int? HiddenId { get; set; }
+    public string? Id { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? Gym { get; set; }

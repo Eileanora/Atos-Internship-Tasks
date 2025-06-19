@@ -1,10 +1,11 @@
 ﻿using Domain.Interfaces;
 using FluentValidation;
 using Service.Common.Constants;
+using Service.DTOs;
 using Service.Interfaces;
 using Service.Mappers;
-using Shared.DTOs;
 using Shared.ErrorAndResults;
+using Shared.Helpers;
 using Shared.ResourceParameters;
 
 namespace Service.Services;
@@ -12,7 +13,7 @@ namespace Service.Services;
 public class ReviewService(
     IUnitOfWork unitOfWork,
     IValidator<ReviewDto> reviewValidator)
-    : IReviewManager
+    : IReviewService
 {
     public async Task<Result<ReviewDto>> GetByIdAsync(int id)
     {
@@ -24,11 +25,10 @@ public class ReviewService(
 
     public async Task<Result<ReviewDto>> AddAsync(ReviewDto reviewDto)
     {
-        var validationResult = await reviewValidator.ValidateAsync(reviewDto, options => options.IncludeRuleSets("CreateBusiness"));
-        if (!validationResult.IsValid)
+        var validationResult = await ValidationHelper.ValidateAndReportAsync(reviewValidator, reviewDto, "CreateBusiness");
+        if (!validationResult.IsSuccess)
         {
-            var errorMessage = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-            return Result<ReviewDto>.Failure(new Error("ValidationError", errorMessage));
+            return Result<ReviewDto>.Failure(validationResult.Error);
         }
         var newReview = reviewDto.ToEntity();
         await unitOfWork.ReviewRepository.AddAsync(newReview);

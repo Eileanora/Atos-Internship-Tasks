@@ -1,5 +1,5 @@
 ﻿using Domain.Models;
-using Shared.DTOs;
+using Service.DTOs;
 using Shared.ResourceParameters;
 
 namespace Service.Mappers;
@@ -11,7 +11,7 @@ public static class OwnerMapper
     {
         return new OwnerDto
         {
-            Id = owner.Id,
+            Id = owner.UserId,
             FirstName = owner.FirstName,
             LastName = owner.LastName,
             Gym = owner.Gym
@@ -37,7 +37,6 @@ public static class OwnerMapper
     {
         return new OwnerDto
         {
-            Id = owner.Id,
             FirstName = owner.FirstName,
             LastName = owner.LastName,
             Gym = owner.Gym,
@@ -45,18 +44,20 @@ public static class OwnerMapper
             CountryName = owner.Country?.Name,
             PokemonIds = owner.PokemonOwners.Select(po => po.PokemonId),
             PokemonCount = owner.PokemonOwners.Count,
+            Id = owner.UserId
         };
     }
 
-    public static OwnerDto ToUpdateDto(this OwnerDto ownerDto)
+    public static OwnerDto ToUpdateDto(this Owner owner)
     {
         return new OwnerDto
         {
-            Id = ownerDto.Id,
-            FirstName = ownerDto.FirstName,
-            LastName = ownerDto.LastName,
-            Gym = ownerDto.Gym,
-            CountryId = ownerDto.CountryId
+            HiddenId = owner.Id,
+            FirstName = owner.FirstName,
+            LastName = owner.LastName,
+            Gym = owner.Gym,
+            CountryId = owner.CountryId,
+            Id = owner.UserId,
         };
     }
     
@@ -83,7 +84,7 @@ public static class OwnerMapper
     {
         return new OwnerDto
         {
-            Id = owner.Id,
+            Id = owner.UserId,
             FirstName = owner.FirstName,
             LastName = owner.LastName,
             Gym = owner.Gym,

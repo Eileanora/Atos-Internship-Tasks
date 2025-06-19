@@ -1,10 +1,10 @@
 ﻿using Domain.Models;
-using Shared.DTOs;
+using Service.DTOs;
 using Shared.ErrorAndResults;
 
 namespace Service.Interfaces;
 
-public interface IAuthManager
+public interface IAuthService
 {
     Task<Result<User>> RegisterAsync(RegisterDto registerDto);
     Task<Result<AuthTokensResponse>> LoginAsync(LoginDto userDto);

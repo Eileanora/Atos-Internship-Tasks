@@ -1,10 +1,10 @@
-﻿using Shared.DTOs;
+﻿using Service.DTOs;
 using Shared.ErrorAndResults;
 using Shared.ResourceParameters;
 
 namespace Service.Interfaces;
 
-public interface IPokemonManager
+public interface IPokemonService
 {
     Task<Result<PagedList<PokemonDto>>> GetAllAsync(PokemonResourceParameters resourceParameters);
     Task<Result<PokemonDto>> GetByIdAsync(int id);

@@ -1,7 +1,7 @@
 ﻿using Domain.Interfaces;
 using FluentValidation;
 using Service.Common.Constants;
-using Shared.DTOs;
+using Service.DTOs;
 
 namespace Service.Validators;
 

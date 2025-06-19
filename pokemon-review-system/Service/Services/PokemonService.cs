@@ -2,17 +2,18 @@
 using FluentValidation;
 using FluentValidation.Internal;
 using Service.Common.Constants;
+using Service.DTOs;
 using Service.Interfaces;
 using Service.Mappers;
-using Shared.DTOs;
 using Shared.ErrorAndResults;
+using Shared.Helpers;
 using Shared.ResourceParameters;
 
 namespace Service.Services;
 
 public class PokemonService(
     IUnitOfWork unitOfWork,
-    IValidator<PokemonDto> pokemonValidator) : IPokemonManager
+    IValidator<PokemonDto> pokemonValidator) : IPokemonService
 {
     public async Task<Result<PagedList<PokemonDto>>> GetAllAsync(
         PokemonResourceParameters resourceParameters)
@@ -31,14 +32,11 @@ public class PokemonService(
 
     public async Task<Result<PokemonDto>> AddAsync(PokemonDto pokemon)
     {
-        var validationResult = await pokemonValidator.ValidateAsync(pokemon,
-            options => options.IncludeRuleSets("CreateBusiness"));
-        if (!validationResult.IsValid)
+        var validationResult = await ValidationHelper.ValidateAndReportAsync(pokemonValidator, pokemon, "CreateBusiness");
+        if (!validationResult.IsSuccess)
         {
-            var errorMessage = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-            return Result<PokemonDto>.Failure(new Error("ValidationError", errorMessage));
+            return Result<PokemonDto>.Failure(validationResult.Error);
         }
-        
         var newPokemon = pokemon.ToEntity();
         await unitOfWork.PokemonRepository.AddAsync(newPokemon);
 
@@ -51,31 +49,21 @@ public class PokemonService(
 
     public async Task<Result<PokemonDto>> UpdateAsync(PokemonDto pokemon)
     {
-        var context= new ValidationContext<PokemonDto>(
+        var validationResult = await ValidationHelper.ValidateAndReportAsync(
+            pokemonValidator,
             pokemon,
-            new PropertyChain(),
-            new RulesetValidatorSelector(new [] {"UpdateBusiness"}))
+            ctx => { ctx.RootContextData["pokemonId"] = pokemon.Id; },
+            "UpdateBusiness");
+        if (!validationResult.IsSuccess)
         {
-            RootContextData = {["pokemonId"] = pokemon.Id }
-        };
-
-        var validationResult = await pokemonValidator.ValidateAsync(context);
-
-        if (!validationResult.IsValid)
-        {
-            var errorMessage = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-            return Result<PokemonDto>.Failure(new Error("ValidationError", errorMessage));
+            return Result<PokemonDto>.Failure(validationResult.Error);
         }
-        
         var pokemonEntity = await unitOfWork.PokemonRepository.FindByIdAsync((int)pokemon.Id);
         pokemonEntity.UpdateEntityFromDto(pokemon);
-        
-        unitOfWork.PokemonRepository.UpdateAsync(pokemonEntity); 
-
+        unitOfWork.PokemonRepository.UpdateAsync(pokemonEntity);
         var result = await unitOfWork.SaveChangesAsync();
         if (result <= 0)
             return Result<PokemonDto>.Failure(ErrorMessages.InternalServerError);
-
         return Result<PokemonDto>.Success(pokemon);
     }
 

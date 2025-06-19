@@ -3,9 +3,9 @@ using Domain.Interfaces;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Service.Common.Constants;
+using Service.DTOs;
 using Service.Interfaces;
 using Service.Mappers;
-using Shared.DTOs;
 using Shared.ErrorAndResults;
 
 namespace Service.Services;
@@ -13,7 +13,7 @@ namespace Service.Services;
 public class AuthService(
     UserManager<User> userManager,
     IGenerateTokenService generateTokenService,
-    IUnitOfWork unitOfWork) : IAuthManager
+    IUnitOfWork unitOfWork) : IAuthService
 {
     public async Task<Result<User>> RegisterAsync(RegisterDto registerDto)
     {

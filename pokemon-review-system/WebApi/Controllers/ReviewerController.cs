@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Service.DTOs;
 using Service.Interfaces;
-using Shared.DTOs;
 using Shared.Helpers;
 using Shared.ResourceParameters;
 using WebApi.Helpers.Extensions;
@@ -14,7 +14,7 @@ namespace WebApi.Controllers;
 [Route("api/Reviewers")]
 [ApiController]
 public class ReviewerController(
-    IReviewerManager reviewerManager,
+    IReviewerService reviewerService,
     IValidator<ReviewerDto> reviewerValidator,
     IPaginationHelper<ReviewerDto, ReviewerResourceParameters> paginationHelper)
     : ControllerBase
@@ -24,7 +24,7 @@ public class ReviewerController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllAsync(
         [FromQuery] ReviewerResourceParameters resourceParameters)    {
-        var reviewers = await reviewerManager.GetAllAsync(resourceParameters);
+        var reviewers = await reviewerService.GetAllAsync(resourceParameters);
         paginationHelper
             .CreateMetaDataHeader(
                 reviewers.Value, resourceParameters, Response.Headers, Url, "GetAllReviewers");
@@ -37,7 +37,7 @@ public class ReviewerController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByIdAsync(int id)
     {
-        var result = await reviewerManager.GetByIdAsync(id);
+        var result = await reviewerService.GetByIdAsync(id);
         return result.ToActionResult();
     }
 
@@ -50,7 +50,7 @@ public class ReviewerController(
         var inputValid = await ValidationHelper.ValidateAndReportAsync(reviewerValidator, reviewerDto, "Input");
         if (!inputValid.IsSuccess)
             return inputValid.ToActionResult();
-        var result = await reviewerManager.AddAsync(reviewerDto);
+        var result = await reviewerService.AddAsync(reviewerDto);
         if (!result.IsSuccess)
             return result.ToActionResult();
         return CreatedAtRoute("GetReviewerById", new { id = result.Value.Id }, result.Value);
@@ -63,7 +63,7 @@ public class ReviewerController(
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> UpdateAsync(int id, JsonPatchDocument<ReviewerDto> patchDoc)
     {
-        var reviewerResult = await reviewerManager.GetByIdAsync(id);
+        var reviewerResult = await reviewerService.GetByIdAsync(id);
         if (!reviewerResult.IsSuccess)
             return reviewerResult.ToActionResult();
 
@@ -77,7 +77,7 @@ public class ReviewerController(
             return inputValid.ToActionResult();
 
         patchedDto.Id = id;
-        var result = await reviewerManager.UpdateAsync(patchedDto);
+        var result = await reviewerService.UpdateAsync(patchedDto);
         if (!result.IsSuccess)
             return result.ToActionResult();
 
@@ -90,10 +90,10 @@ public class ReviewerController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        var reviewerResult = await reviewerManager.GetByIdAsync(id);
+        var reviewerResult = await reviewerService.GetByIdAsync(id);
         if (!reviewerResult.IsSuccess)
             return reviewerResult.ToActionResult();
-        var result = await reviewerManager.DeleteAsync(reviewerResult.Value);
+        var result = await reviewerService.DeleteAsync(reviewerResult.Value);
         if (!result.IsSuccess)
             return result.ToActionResult();
         return NoContent();

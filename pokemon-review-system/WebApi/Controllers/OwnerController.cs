@@ -1,13 +1,11 @@
-﻿using System.Security.Claims;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Service.DTOs;
 using Service.Interfaces;
-using Shared.DTOs;
 using Shared.Helpers;
 using Shared.ResourceParameters;
-using WebApi.Filters;
 using WebApi.Helpers;
 using WebApi.Helpers.Extensions;
 using WebApi.Helpers.PaginationHelper;
@@ -17,7 +15,7 @@ namespace WebApi.Controllers;
 
 [Route("api/Owners")]
 [ApiController]
-public class OwnerController(IOwnerManager ownerManager,
+public class OwnerController(IOwnerService ownerManager,
     IValidator<OwnerDto> ownerValidator,
     IValidator<CreateOwnerDto> createOwnerValidator,
     IPaginationHelper<OwnerDto, OwnerResourceParameters> paginationHelper) : ControllerBase
@@ -42,7 +40,7 @@ public class OwnerController(IOwnerManager ownerManager,
     // [ServiceFilter(typeof(AuthOwnerByIdFilter))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetByIdAsync(int id)
+    public async Task<IActionResult> GetByIdAsync(string id)
     {
         var result = await ownerManager.GetByIdAsync(id);
         return result.ToActionResult();
@@ -60,7 +58,7 @@ public class OwnerController(IOwnerManager ownerManager,
         var result = await ownerManager.AddAsync(ownerDto);
         if (!result.IsSuccess)
             return result.ToActionResult();
-        return Created();
+        return CreatedAtRoute("GetOwnerById", new { id = result.Value.Id }, result.Value);
     }
     
     // PATCH ASYNC
@@ -70,9 +68,9 @@ public class OwnerController(IOwnerManager ownerManager,
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> UpdateAsync(int id, JsonPatchDocument<OwnerDto> patchDoc)
+    public async Task<IActionResult> UpdateAsync(string id, JsonPatchDocument<OwnerDto> patchDoc)
     {
-        var ownerResult = await ownerManager.GetByIdAsync(id);
+        var ownerResult = await ownerManager.GetByIdForPatchAsync(id);
         if (!ownerResult.IsSuccess)
             return ownerResult.ToActionResult();
 
@@ -99,7 +97,7 @@ public class OwnerController(IOwnerManager ownerManager,
     // [ServiceFilter(typeof(AuthOwnerByIdFilter))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteAsync(int id)
+    public async Task<IActionResult> DeleteAsync(string id)
     {
         var ownerResult = await ownerManager.GetByIdAsync(id);
         if (!ownerResult.IsSuccess)
@@ -116,7 +114,7 @@ public class OwnerController(IOwnerManager ownerManager,
     // [ServiceFilter(typeof(AuthOwnerByIdFilter))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AddPokemonToOwnerAsync(int ownerId, int pokemonId)
+    public async Task<IActionResult> AddPokemonToOwnerAsync(string ownerId, int pokemonId)
     {
         var authenticationResult = await ownerManager.ValidateOwnerAuthentication(ownerId);
         if (!authenticationResult.IsSuccess)
@@ -133,7 +131,7 @@ public class OwnerController(IOwnerManager ownerManager,
     // [ServiceFilter(typeof(AuthOwnerByIdFilter))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> RemovePokemonFromOwnerAsync(int ownerId, int pokemonId)
+    public async Task<IActionResult> RemovePokemonFromOwnerAsync(string ownerId, int pokemonId)
     {
         var authenticationResult = await ownerManager.ValidateOwnerAuthentication(ownerId);
         if (!authenticationResult.IsSuccess)

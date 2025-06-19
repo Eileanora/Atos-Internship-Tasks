@@ -1,10 +1,11 @@
 ﻿using Domain.Interfaces;
+using Domain.Models;
 using FluentValidation;
 using FluentValidation.Internal;
 using Service.Common.Constants;
+using Service.DTOs;
 using Service.Interfaces;
 using Service.Mappers;
-using Shared.DTOs;
 using Shared.ErrorAndResults;
 using Shared.Helpers;
 using Shared.ResourceParameters;
@@ -16,9 +17,9 @@ public class OwnerService(
     IValidator<OwnerDto> ownerValidator,
     IValidator<CreateOwnerDto> createOwnerValidator,
     IValidator<Domain.Models.PokemonOwner> pokemonOwnerValidator,
-    IAuthManager authManager,
+    IAuthService authService,
     IUserContext userContext)
-    : IOwnerManager
+    : IOwnerService
 {
     public async Task<Result<PagedList<OwnerDto>>> GetAllAsync(OwnerResourceParameters resourceParameters)
     {
@@ -26,53 +27,54 @@ public class OwnerService(
         return Result<PagedList<OwnerDto>>.Success(owners.ToListDto());
     }
 
-    public async Task<Result<OwnerDto>> GetByIdAsync(int id)
+    public async Task<Result<OwnerDto>> GetByIdAsync(string id)
     {
         var owner = await unitOfWork.OwnerRepository.GetByIdAsyncWithInclude(id);
         if (owner == null)
             return Result<OwnerDto>.Failure(ErrorMessages.NotFound);
         return Result<OwnerDto>.Success(owner.ToDetailDto());
     }
+    
+    public async Task<Result<OwnerDto>> GetByIdForPatchAsync(string id)
+    {
+        var owner = await unitOfWork.OwnerRepository.GetByUserIdAsync(id);
+        if (owner == null)
+            return Result<OwnerDto>.Failure(ErrorMessages.NotFound);
+        return Result<OwnerDto>.Success(owner.ToUpdateDto());
+    }
 
-    public async Task<Result<int>> AddAsync(CreateOwnerDto owner)
+    public async Task<Result<OwnerDto>> AddAsync(CreateOwnerDto owner)
     {
         var validationResult = await ValidationHelper.ValidateAndReportAsync(createOwnerValidator, owner, "CreateBusiness");
         if(!validationResult.IsSuccess)
-            return Result<int>.Failure(validationResult.Error);
+            return Result<OwnerDto>.Failure(validationResult.Error);
 
-        var createUserResult = await authManager.RegisterAsync(owner.OwnerToRegisterDto());
+        var createUserResult = await authService.RegisterAsync(owner.OwnerToRegisterDto());
         if (!createUserResult.IsSuccess)
-            return Result<int>.Failure(createUserResult.Error);
+            return Result<OwnerDto>.Failure(createUserResult.Error);
         
         var newOwner = owner.ToEntity();
         newOwner.UserId = createUserResult.Value.Id;
         await unitOfWork.OwnerRepository.AddAsync(newOwner);
         var result = await unitOfWork.SaveChangesAsync();
         if (result <= 0)
-            return Result<int>.Failure(ErrorMessages.InternalServerError);
+            return Result<OwnerDto>.Failure(ErrorMessages.InternalServerError);
         
-        await authManager.AddToRoleAsync("Owner", createUserResult.Value, null);
+        await authService.AddToRoleAsync("Owner", createUserResult.Value, null);
         
-        return Result<int>.Success(newOwner.Id);
+        return Result<OwnerDto>.Success(newOwner.ToCreatedDto());
     }
 
     public async Task<Result<OwnerDto>> UpdateAsync(OwnerDto owner)
     {
-        var context = new ValidationContext<OwnerDto>(
+        var validationResult = await ValidationHelper.ValidateAndReportAsync(ownerValidator,
             owner,
-            new PropertyChain(),
-            new RulesetValidatorSelector(new[] { "Business" }))
-        {
-            RootContextData = { ["ownerId"] = owner.Id }
-        };
-        var validationResult = await ownerValidator.ValidateAsync(context);
-        if (!validationResult.IsValid)
-        {
-            var errorMessage = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-            return Result<OwnerDto>.Failure(new Error("ValidationError", errorMessage));
-        }
+            ctx => { ctx.RootContextData["ownerId"] = owner.HiddenId; },
+            "Business");
+        if (!validationResult.IsSuccess)
+            return Result<OwnerDto>.Failure(validationResult.Error);
         
-        var ownerEntity = await unitOfWork.OwnerRepository.FindByIdAsync((int)owner.Id);
+        var ownerEntity = await unitOfWork.OwnerRepository.FindByIdAsync((int)owner.HiddenId);
         ownerEntity.UpdateEntityFromDto(owner);
         
         unitOfWork.OwnerRepository.UpdateAsync(ownerEntity);
@@ -84,9 +86,10 @@ public class OwnerService(
 
     public async Task<Result> DeleteAsync(OwnerDto owner)
     {
-        var ownerEntity = await unitOfWork.OwnerRepository.FindByIdAsync((int)owner.Id);
+        var ownerEntity = await unitOfWork.OwnerRepository.GetByUserIdAsync(owner.Id);
         if (ownerEntity == null)
             return Result.Failure(new Error("NotFound", "Owner not found"));
+        
         unitOfWork.OwnerRepository.DeleteAsync(ownerEntity);
         var result = await unitOfWork.SaveChangesAsync();
         if (result <= 0)
@@ -94,14 +97,17 @@ public class OwnerService(
         return Result.Success();
     }
     
-    public async Task<Result> AddPokemonToOwnerAsync(int ownerId, int pokemonId)
+    public async Task<Result> AddPokemonToOwnerAsync(string ownerId, int pokemonId)
     {
-        var pokemonOwner = new Domain.Models.PokemonOwner { OwnerId = ownerId, PokemonId = pokemonId };
-        var validationResult = await pokemonOwnerValidator.ValidateAsync(pokemonOwner, options => options.IncludeRuleSets("Input", "CreateBusiness"));
-        if (!validationResult.IsValid)
+        var id = await unitOfWork.OwnerRepository.GetOwnerIdByUserIdAsync(ownerId);
+        if (id <= 0)
+            return Result.Failure(ErrorMessages.NotFound);
+        
+        var pokemonOwner = new PokemonOwner { OwnerId = id, PokemonId = pokemonId };
+        var validationResult = await ValidationHelper.ValidateAndReportAsync(pokemonOwnerValidator, pokemonOwner, "Input,CreateBusiness");
+        if (!validationResult.IsSuccess)
         {
-            var errorMessage = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-            return Result.Failure(new Error("ValidationError", errorMessage));
+            return Result.Failure(validationResult.Error);
         }
         
         await unitOfWork.PokemonOwnerRepository.AddAsync(pokemonOwner);
@@ -111,14 +117,17 @@ public class OwnerService(
         return Result.Success();
     }
     
-    public async Task<Result> RemovePokemonFromOwnerAsync(int ownerId, int pokemonId)
+    public async Task<Result> RemovePokemonFromOwnerAsync(string ownerId, int pokemonId)
     {
-        var pokemonOwner = new Domain.Models.PokemonOwner { OwnerId = ownerId, PokemonId = pokemonId };
-        var validationResult = await pokemonOwnerValidator.ValidateAsync(pokemonOwner, options => options.IncludeRuleSets("Input", "DeleteBusiness"));
-        if (!validationResult.IsValid)
+        var id = await unitOfWork.OwnerRepository.GetOwnerIdByUserIdAsync(ownerId);
+        if (id <= 0)
+            return Result.Failure(ErrorMessages.NotFound);
+        
+        var pokemonOwner = new PokemonOwner { OwnerId = id, PokemonId = pokemonId };
+        var validationResult = await ValidationHelper.ValidateAndReportAsync(pokemonOwnerValidator, pokemonOwner, "Input,DeleteBusiness");
+        if (!validationResult.IsSuccess)
         {
-            var errorMessage = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-            return Result.Failure(new Error("ValidationError", errorMessage));
+            return Result.Failure(validationResult.Error);
         }
         
         unitOfWork.PokemonOwnerRepository.DeleteAsync(pokemonOwner);
@@ -128,15 +137,15 @@ public class OwnerService(
         return Result.Success();
     }
     
-    public async Task<Result> ValidateOwnerAuthentication(int ownerId)
+    public async Task<Result> ValidateOwnerAuthentication(string ownerId)
     {
-        if (userContext.IsAdmin)
-            return Result.Success();
-
-        var isValid = await unitOfWork.OwnerRepository.OwnerIdIsUserIdAsync(ownerId, userContext.UserId.ToString());
-        
-        if (!isValid)
-            return Result.Failure(ErrorMessages.Unauthorized);
+        // if (userContext.IsAdmin)
+        //     return Result.Success();
+        //
+        // var isValid = await unitOfWork.OwnerRepository.OwnerIdIsUserIdAsync(ownerId, userContext.Id.ToString());
+        //
+        // if (!isValid)
+        //     return Result.Failure(ErrorMessages.Unauthorized);
         return Result.Success();
     }
 }

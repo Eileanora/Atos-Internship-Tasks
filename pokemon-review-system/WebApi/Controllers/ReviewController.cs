@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Service.DTOs;
 using Service.Interfaces;
-using Shared.DTOs;
 using Shared.Helpers;
 using Shared.ResourceParameters;
 using WebApi.Helpers.Extensions;
@@ -13,7 +13,7 @@ namespace WebApi.Controllers;
 [Route("api/Reviews")]
 [ApiController]
 public class ReviewController(
-    IReviewManager reviewManager,
+    IReviewService reviewService,
     IValidator<ReviewDto> reviewValidator,
     IPaginationHelper<ReviewDto, ReviewResourceParameters> paginationHelper)
     : ControllerBase
@@ -23,7 +23,7 @@ public class ReviewController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllAsync([FromQuery] ReviewResourceParameters resourceParameters)
     {
-        var result = await reviewManager.GetAllAsync(resourceParameters);
+        var result = await reviewService.GetAllAsync(resourceParameters);
         
         paginationHelper.
             CreateMetaDataHeader(
@@ -38,7 +38,7 @@ public class ReviewController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByIdAsync(int id)
     {
-        var result = await reviewManager.GetByIdAsync(id);
+        var result = await reviewService.GetByIdAsync(id);
         return result.ToActionResult();
     }
 
@@ -51,7 +51,7 @@ public class ReviewController(
         var inputValid = await ValidationHelper.ValidateAndReportAsync(reviewValidator, reviewDto, "Input");
         if (!inputValid.IsSuccess)
             return inputValid.ToActionResult();
-        var result = await reviewManager.AddAsync(reviewDto);
+        var result = await reviewService.AddAsync(reviewDto);
         if (!result.IsSuccess)
             return result.ToActionResult();
         return CreatedAtRoute("GetReviewById", new { id = result.Value.Id }, result.Value);
@@ -63,10 +63,10 @@ public class ReviewController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        var reviewResult = await reviewManager.GetByIdAsync(id);
+        var reviewResult = await reviewService.GetByIdAsync(id);
         if (!reviewResult.IsSuccess)
             return reviewResult.ToActionResult();
-        var result = await reviewManager.DeleteAsync(reviewResult.Value);
+        var result = await reviewService.DeleteAsync(reviewResult.Value);
         if (!result.IsSuccess)
             return result.ToActionResult();
         return NoContent();

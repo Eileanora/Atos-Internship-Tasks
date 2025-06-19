@@ -11,12 +11,12 @@ public class OwnerRepository(DataContext context,
     ISortHelper<Owner> sortHelper)
     : BaseRepository<Owner>(context), IOwnerRepository
 {
-    public async Task<Owner?> GetByIdAsyncWithInclude(int id)
+    public async Task<Owner?> GetByIdAsyncWithInclude(string id)
     {
         return await context.Owners
             .Include(o => o.Country)
             .Include(o => o.PokemonOwners)
-            .FirstOrDefaultAsync(o => o.Id == id);
+            .FirstOrDefaultAsync(o => o.UserId == id);
     }
     
     public async Task<bool> ExistsAsync(int ownerId)
@@ -70,5 +70,19 @@ public class OwnerRepository(DataContext context,
         return await context.Owners
             .IgnoreQueryFilters()
             .AnyAsync(o => o.Id == ownerId && o.UserId == userId);
+    }
+
+    public async Task<int> GetOwnerIdByUserIdAsync(string userId)
+    {
+        var owner = await context.Owners
+            .FirstOrDefaultAsync(o => o.UserId == userId);
+        
+        return owner?.Id ?? 0;
+    }
+
+    public async Task<Owner?> GetByUserIdAsync(string userId)
+    {
+        return await context.Owners
+            .FirstOrDefaultAsync(o => o.UserId == userId);
     }
 }

@@ -14,19 +14,22 @@ public class PokemonOwnerValidator : AbstractValidator<PokemonOwner>
         RuleSet("Input", () =>
         {
             RuleFor(po => po.OwnerId)
-                .NotNull().WithMessage(string.Format(CommonValidationErrorMessages.Required, nameof(PokemonOwner.OwnerId)))
-                .MustAsync(async (ownerId, cancellation) =>
-                    await unitOfWork.OwnerRepository.ExistsAsync(ownerId))
-                .WithMessage(po => string.Format(CommonValidationErrorMessages.DoesNotExist, "Owner", po.OwnerId));
+                .NotNull().WithMessage(string.Format(CommonValidationErrorMessages.Required,
+                    nameof(PokemonOwner.OwnerId)));
 
             RuleFor(po => po.PokemonId)
-                .NotNull().WithMessage(string.Format(CommonValidationErrorMessages.Required, nameof(PokemonOwner.PokemonId)))
+                .NotNull().WithMessage(string.Format(CommonValidationErrorMessages.Required,
+                    nameof(PokemonOwner.PokemonId)));
+        });
+        
+        // TODO : Get rid of duplicate code by using a common rule set for both Create and Delete
+        RuleSet("CreateBusiness", () =>
+        {
+            RuleFor(po => po.PokemonId)
                 .MustAsync(async (pokemonId, cancellation) =>
                     await unitOfWork.PokemonRepository.ExistsAsync(pokemonId))
                 .WithMessage(po => string.Format(CommonValidationErrorMessages.DoesNotExist, "Pokemon", po.PokemonId));
-        });
-        RuleSet("CreateBusiness", () =>
-        {
+            
             RuleFor(po => po)
                 .MustAsync(async (po, cancellation) =>
                     !await unitOfWork.PokemonOwnerRepository.OwnerPokemonExistsAsync(po.OwnerId, po.PokemonId))
@@ -34,6 +37,11 @@ public class PokemonOwnerValidator : AbstractValidator<PokemonOwner>
         });
         RuleSet("DeleteBusiness", () =>
         {
+            RuleFor(po => po.PokemonId)
+                .MustAsync(async (pokemonId, cancellation) =>
+                    await unitOfWork.PokemonRepository.ExistsAsync(pokemonId))
+                .WithMessage(po => string.Format(CommonValidationErrorMessages.DoesNotExist, "Pokemon", po.PokemonId));
+            
             RuleFor(po => po)
                 .MustAsync(async (po, cancellation) =>
                     await unitOfWork.PokemonOwnerRepository.OwnerPokemonExistsAsync(po.OwnerId, po.PokemonId))

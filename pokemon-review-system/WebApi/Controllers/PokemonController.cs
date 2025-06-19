@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Service.DTOs;
 using Service.Interfaces;
-using Shared.DTOs;
 using Service.Mappers;
 using Shared.Helpers;
 using Shared.ResourceParameters;
@@ -16,7 +16,7 @@ namespace WebApi.Controllers;
 
 [Route("api/Pokemon")]
 [ApiController]
-public class PokemonController(IPokemonManager pokemonManager,
+public class PokemonController(IPokemonService pokemonService,
     IValidator<PokemonDto> pokemonValidator,
     IPaginationHelper<PokemonDto, PokemonResourceParameters> paginationHelper) : ControllerBase
 {
@@ -26,7 +26,7 @@ public class PokemonController(IPokemonManager pokemonManager,
     public async Task<IActionResult> GetAllAsync(
         [FromQuery] PokemonResourceParameters resourceParameters)
     {
-        var pokemons = await pokemonManager.GetAllAsync(resourceParameters);
+        var pokemons = await pokemonService.GetAllAsync(resourceParameters);
         paginationHelper
             .CreateMetaDataHeader(
                 pokemons.Value, resourceParameters, Response.Headers, Url, "GetAllPokemons");
@@ -41,7 +41,7 @@ public class PokemonController(IPokemonManager pokemonManager,
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByIdAsync(int id)
     {
-        var result = await pokemonManager.GetByIdAsync(id);
+        var result = await pokemonService.GetByIdAsync(id);
         return result.ToActionResult();
     }
     
@@ -51,7 +51,7 @@ public class PokemonController(IPokemonManager pokemonManager,
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetRatingAsync(int id)
     {
-        var result = await pokemonManager.GetPokemonRatingAsync(id);
+        var result = await pokemonService.GetPokemonRatingAsync(id);
         return result.ToActionResult();
     }
     
@@ -63,7 +63,7 @@ public class PokemonController(IPokemonManager pokemonManager,
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> UpdateAsync(int id, JsonPatchDocument<PokemonDto> patchDoc)
     {
-        var pokemonResult = await pokemonManager.GetByIdAsync(id);
+        var pokemonResult = await pokemonService.GetByIdAsync(id);
         if (!pokemonResult.IsSuccess)
             return pokemonResult.ToActionResult();
 
@@ -77,7 +77,7 @@ public class PokemonController(IPokemonManager pokemonManager,
             return inputValid.ToActionResult();
 
         patchedDto.Id = id;
-        var result = await pokemonManager.UpdateAsync(pokemonToPatch);
+        var result = await pokemonService.UpdateAsync(pokemonToPatch);
         if (!result.IsSuccess)
             return result.ToActionResult();
 
@@ -95,7 +95,7 @@ public class PokemonController(IPokemonManager pokemonManager,
         var inputValid = await ValidationHelper.ValidateAndReportAsync(pokemonValidator, pokemonDto, "Input");
         if (!inputValid.IsSuccess)
             return inputValid.ToActionResult();
-        var result = await pokemonManager.AddAsync(pokemonDto);
+        var result = await pokemonService.AddAsync(pokemonDto);
         if (!result.IsSuccess)
             return result.ToActionResult();
         return CreatedAtRoute("GetPokemonById", new { id = result.Value.Id }, result.Value);
@@ -109,10 +109,10 @@ public class PokemonController(IPokemonManager pokemonManager,
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        var pokemonResult = await pokemonManager.GetByIdAsync(id);
+        var pokemonResult = await pokemonService.GetByIdAsync(id);
         if (!pokemonResult.IsSuccess)
             return pokemonResult.ToActionResult();
-        var result = await pokemonManager.DeleteAsync(pokemonResult.Value);
+        var result = await pokemonService.DeleteAsync(pokemonResult.Value);
         if (!result.IsSuccess)
             return result.ToActionResult();
         return NoContent();

@@ -2,10 +2,11 @@
 using FluentValidation;
 using FluentValidation.Internal;
 using Service.Common.Constants;
+using Service.DTOs;
 using Service.Interfaces;
 using Service.Mappers;
-using Shared.DTOs;
 using Shared.ErrorAndResults;
+using Shared.Helpers;
 using Shared.ResourceParameters;
 
 namespace Service.Services;
@@ -13,7 +14,7 @@ namespace Service.Services;
 public class ReviewerService(
     IUnitOfWork unitOfWork,
     IValidator<ReviewerDto> reviewerValidator)
-    : IReviewerManager
+    : IReviewerService
 {
     public async Task<Result<PagedList<ReviewerDto>>> GetAllAsync(ReviewerResourceParameters resourceParameters)
     {
@@ -31,11 +32,10 @@ public class ReviewerService(
 
     public async Task<Result<ReviewerDto>> AddAsync(ReviewerDto reviewerDto)
     {
-        var validationResult = await reviewerValidator.ValidateAsync(reviewerDto, options => options.IncludeRuleSets("CreateBusiness"));
-        if (!validationResult.IsValid)
+        var validationResult = await ValidationHelper.ValidateAndReportAsync(reviewerValidator, reviewerDto, "CreateBusiness");
+        if (!validationResult.IsSuccess)
         {
-            var errorMessage = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-            return Result<ReviewerDto>.Failure(new Error("ValidationError", errorMessage));
+            return Result<ReviewerDto>.Failure(validationResult.Error);
         }
         var newReviewer = reviewerDto.ToEntity();
         await unitOfWork.ReviewerRepository.AddAsync(newReviewer);
@@ -47,19 +47,13 @@ public class ReviewerService(
 
     public async Task<Result<ReviewerDto>> UpdateAsync(ReviewerDto reviewerDto)
     {
-        var context = new ValidationContext<ReviewerDto>(
+        var validationResult = await ValidationHelper.ValidateAndReportAsync(reviewerValidator,
             reviewerDto,
-            new PropertyChain(),
-            new RulesetValidatorSelector(new[] { "UpdateBusiness" }))
+            ctx => { ctx.RootContextData["reviewerId"] = reviewerDto.Id; },
+            "UpdateBusiness");
+        if (!validationResult.IsSuccess)
         {
-            RootContextData = { ["reviewerId"] = reviewerDto.Id }
-        };
-        var validationResult = await reviewerValidator.ValidateAsync(context);
-        
-        if (!validationResult.IsValid)
-        {
-            var errorMessage = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-            return Result<ReviewerDto>.Failure(new Error("ValidationError", errorMessage));
+            return Result<ReviewerDto>.Failure(validationResult.Error);
         }
         
         var reviewerEntity = await unitOfWork.ReviewerRepository.GetByIdAsync(reviewerDto.Id ?? 0);

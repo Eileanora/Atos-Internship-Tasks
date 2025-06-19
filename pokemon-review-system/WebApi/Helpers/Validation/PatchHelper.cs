@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Shared.DTOs;
+using Service.DTOs;
 using Shared.ErrorAndResults;
 
 namespace WebApi.Helpers.Validation

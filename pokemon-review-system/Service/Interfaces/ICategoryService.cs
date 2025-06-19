@@ -1,9 +1,9 @@
 ﻿using Domain.Models;
-using Shared.DTOs;
+using Service.DTOs;
 
 namespace Service.Interfaces;
 
-public interface ICategoryManager
+public interface ICategoryService
 {
     Task<IEnumerable<CategoryDto>> GetAllAsync();
     Task<CategoryDto?> GetByIdAsync(int id);

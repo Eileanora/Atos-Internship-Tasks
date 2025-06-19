@@ -1,11 +1,11 @@
 ﻿using Domain.Interfaces;
+using Service.DTOs;
 using Service.Interfaces;
 using Service.Mappers;
-using Shared.DTOs;
 
 namespace Service.Services;
 
-public class CountryService(IUnitOfWork unitOfWork) : ICountryManager
+public class CountryService(IUnitOfWork unitOfWork) : ICountryService
 {
     // GET ALL ASYNC
     public async Task<IEnumerable<CountryDto>> GetAllAsync()

@@ -3,7 +3,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Service.Common.Constants;
-using Shared.DTOs;
+using Service.DTOs;
 
 namespace Service.Validators;
 

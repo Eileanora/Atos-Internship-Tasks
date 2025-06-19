@@ -1,4 +1,4 @@
-﻿namespace Shared.DTOs;
+﻿namespace Service.DTOs;
 
 public record LoginDto
 {

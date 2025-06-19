@@ -2,7 +2,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Shared.DTOs;
+using Service.DTOs;
 using Shared.ResourceParameters;
 using WebApi.Helpers.ExceptionHandlers;
 using WebApi.Helpers.PaginationHelper;

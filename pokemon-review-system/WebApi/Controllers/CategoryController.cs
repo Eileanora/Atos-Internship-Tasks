@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Service.DTOs;
 using Service.Interfaces;
-using Shared.DTOs;
 
 namespace WebApi.Controllers;
 
 [Route("api/Category")]
 [ApiController]
-public class CategoryController(ICategoryManager categoryManager) : ControllerBase
+public class CategoryController(ICategoryService categoryService) : ControllerBase
 {
     // GET ALL ASYNC
     [HttpGet(Name = "GetAllCategories")]
@@ -16,7 +16,7 @@ public class CategoryController(ICategoryManager categoryManager) : ControllerBa
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         
-        var categories = await categoryManager.GetAllAsync();
+        var categories = await categoryService.GetAllAsync();
         return Ok(categories);
     }
     
@@ -26,7 +26,7 @@ public class CategoryController(ICategoryManager categoryManager) : ControllerBa
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<CategoryDto>> GetByIdAsync(int id)
     {
-        var category = await categoryManager.GetByIdAsync(id);
+        var category = await categoryService.GetByIdAsync(id);
         if (category == null)
             return NotFound();
         return Ok(category);
