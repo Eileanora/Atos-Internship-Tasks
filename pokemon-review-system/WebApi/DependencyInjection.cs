@@ -1,9 +1,11 @@
 ﻿using System.Security.Claims;
 using System.Text;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Service.DTOs;
 using Shared.ResourceParameters;
+using WebApi.Filters;
 using WebApi.Helpers.ExceptionHandlers;
 using WebApi.Helpers.PaginationHelper;
 
@@ -62,6 +64,8 @@ public static class DependencyInjection
                 };
             });
         #endregion
+        
+        services.AddScoped<AuthOwnerByIdFilter>();
         
         return services;
     }

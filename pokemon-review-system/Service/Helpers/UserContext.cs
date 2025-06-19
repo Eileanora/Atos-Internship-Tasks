@@ -1,8 +1,7 @@
 ﻿using Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
-using Service.Helpers;
 
-namespace Service.Services;
+namespace Service.Helpers;
 
 public sealed class UserContext(IHttpContextAccessor httpContextAccessor)
     : IUserContext

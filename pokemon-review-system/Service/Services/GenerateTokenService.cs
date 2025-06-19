@@ -61,7 +61,7 @@ public class GenerateTokenService(
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         var refreshToken = Convert.ToBase64String(randomNumber);
-        var expires = DateTime.UtcNow.AddMinutes(configuration.GetValue<int>("Jwt:RefreshTokenExpireDays"));
+        var expires = DateTime.UtcNow.AddDays(configuration.GetValue<int>("Jwt:RefreshTokenExpireDays"));
         return Result<(string, DateTime)>.Success((refreshToken, expires));
     }
     
