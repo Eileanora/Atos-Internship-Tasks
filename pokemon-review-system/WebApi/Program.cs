@@ -1,8 +1,11 @@
 using System.Security.Claims;
+using Domain.Models;
 using Infrastructure;
 using Infrastructure.Data;
+using Microsoft.AspNetCore.Identity;
 using Service;
 using WebApi;
+using WebApi.Endpoints;
 using WebApi.Helpers;
 using WebApi.Helpers.ExceptionHandlers;
 
@@ -41,9 +44,9 @@ void SeedData(IHost app)
 
     using var scope = scopedFactory.CreateScope();
     var service = scope.ServiceProvider.GetService<Seed>();
-    service.SeedDataContext();
+    var userManager = scope.ServiceProvider.GetService<UserManager<User>>();
+    service.SeedDataContext(userManager);
 }
-
 #endregion
 
 // Configure the HTTP request pipeline.
@@ -53,6 +56,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseSwagger();
 app.MapControllers();
+
 app.UseExceptionHandler();
 
 app.Run();

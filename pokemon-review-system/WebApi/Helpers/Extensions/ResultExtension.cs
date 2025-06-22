@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Service.Common.Constants;
 using Shared.ErrorAndResults;
 
@@ -27,7 +28,10 @@ public static class ResultExtension
             nameof(ErrorMessages.NotFound) or "NotFound" => new NotFoundObjectResult(error),
             nameof(ErrorMessages.Unauthorized) or "Unauthorized" => new UnauthorizedObjectResult(error),
             nameof(ErrorMessages.InvalidInput) or "InvalidInput" => new BadRequestObjectResult(error),
-            nameof(ErrorMessages.ValidationError) or "ValidationError" => new BadRequestObjectResult(error),
+            nameof(ErrorMessages.ValidationError) or "ValidationError" =>
+                error.Description == CommonValidationErrorMessages.ResourceNotFound
+                    ? new NotFoundObjectResult(error)
+                    : new BadRequestObjectResult(error),
             nameof(ErrorMessages.InternalServerError) or "InternalServerError" => new ObjectResult(error) { StatusCode = 500 },
             nameof(ErrorMessages.WrongCredentials) or "WrongCredentials" => new UnauthorizedObjectResult(error),
             nameof(ErrorMessages.CannotGenerateToken) or "CannotGenerateToken" => new ObjectResult(error) { StatusCode = 500 },

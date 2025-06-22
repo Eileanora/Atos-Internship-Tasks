@@ -4,7 +4,7 @@ using Shared.ErrorAndResults;
 
 public static class ErrorMessages
 {
-    public static readonly Error NotFound = new("NotFound", "The requested resource was not found.");
+    public static readonly Error NotFound = new("NotFound", CommonValidationErrorMessages.ResourceNotFound);
     public static readonly Error InvalidInput = new("InvalidInput", "The input provided is invalid.");
     public static readonly Error Unauthorized = new("Unauthorized", "You are not authorized to perform this action.");
     public static readonly Error InternalServerError = new("InternalServerError", "An internal server error occurred. Please try again later.");
