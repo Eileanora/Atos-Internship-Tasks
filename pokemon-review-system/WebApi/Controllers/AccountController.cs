@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Service.DTOs;
 using Service.Interfaces;
+using WebApi.Filters;
 using WebApi.Helpers.Extensions;
 
 namespace WebApi.Controllers;
@@ -32,6 +32,7 @@ public class AccountController(
     
     // Refresh
     [HttpPost("refresh-token")]
+    // USE input validation filter
     public async Task<IActionResult> RefreshToken([FromBody] RefreshRequestDto refreshRequest)
     {
         if (string.IsNullOrEmpty(refreshRequest.AccessToken) || string.IsNullOrEmpty(refreshRequest.RefreshToken))
@@ -48,15 +49,4 @@ public class AccountController(
         await authService.AddToRoleAsync(request.Role, null, request.Email);
         return Ok();
     }
-}
-
-public record LogoutRequest
-{
-    public string RefreshToken { get; init; }
-}
-
-public record AddRoleRequest
-{
-    public string Email { get; init; }
-    public string Role { get; init; }
 }

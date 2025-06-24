@@ -111,6 +111,8 @@ public class AuthService(
         var user = sentUser;
         if (email != null) // handle use case where this is method is called from assignRole endpoint
             user = await userManager.FindByEmailAsync(email);
+        if (user == null)
+            return Result.Failure(ErrorMessages.NotFound);
         
         // delete previous roles
         var roles = await userManager.GetRolesAsync(user);

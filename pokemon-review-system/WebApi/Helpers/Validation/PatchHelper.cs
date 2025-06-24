@@ -20,10 +20,8 @@ namespace WebApi.Helpers.Validation
             {
                 return (originalDto, Result.Failure(Service.Common.Constants.ErrorMessages.ValidationError));
             }
-            // var validationResult = await validator.ValidateAsync(originalDto, options => options.IncludeRuleSets(ruleSet));
-            // if (!validationResult.IsValid)
-            //     return (originalDto, Result.Failure(Service.Common.Constants.ErrorMessages.ValidationError));
             return (originalDto, Result.Success());
         }
     }
 }
+

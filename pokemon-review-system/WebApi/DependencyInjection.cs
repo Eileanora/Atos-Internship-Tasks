@@ -15,9 +15,10 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApiLayer(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddExceptionHandler<ValidationExceptionHandler>();
+        services.AddExceptionHandler<JsonReaderExceptionHandler>();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
-        services.AddExceptionHandler<ValidationExceptionHandler>();
         services.AddScoped<IPaginationHelper<PokemonDto, PokemonResourceParameters>,
                 PaginationHelper<PokemonDto, PokemonResourceParameters>>();
         
